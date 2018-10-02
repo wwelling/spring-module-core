@@ -104,4 +104,11 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <scm>
+    <url>https://github.com/folio-org/spring-module-core</url>
+    <connection>scm:git:git://github.com:folio-org/spring-module-core.git</connection>
+    <developerConnection>scm:git:git@github.com:folio-org/spring-module-core.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
 </project>
