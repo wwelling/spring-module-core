@@ -3,6 +3,7 @@ package org.folio.rest.tenant.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -140,7 +141,7 @@ public class HibernateSchemaService {
       } else {
         script = resource.getFile();
       }
-      statement.execute(FileUtils.readFileToString(script));
+      statement.execute(FileUtils.readFileToString(script, StandardCharsets.UTF_8));
     }
     statement.close();
   }
