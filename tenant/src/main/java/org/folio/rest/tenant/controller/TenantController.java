@@ -2,6 +2,7 @@ package org.folio.rest.tenant.controller;
 
 import static org.folio.rest.tenant.TenantConstants.TENANT_HEADER_NAME;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.folio.rest.tenant.model.request.TenantAttributes;
@@ -29,7 +30,7 @@ public class TenantController {
   public ResponseEntity<String> create(
     @RequestHeader(required = true, value = TENANT_HEADER_NAME) String tenant,
     @RequestBody @Validated TenantAttributes attributes
-  ) throws SQLException {
+  ) throws SQLException, IOException {
   // @formatter:on
     hibernateSchemaService.createTenant(tenant);
     return new ResponseEntity<String>("Success", HttpStatus.CREATED);

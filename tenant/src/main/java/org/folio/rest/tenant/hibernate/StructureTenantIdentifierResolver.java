@@ -7,7 +7,8 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.folio.rest.tenant.exception.NoTenantHeaderException;
+// TODO: uncomment to throw
+// import org.folio.rest.tenant.exception.NoTenantHeaderException;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
@@ -25,8 +26,8 @@ public class StructureTenantIdentifierResolver implements CurrentTenantIdentifie
       if (tenant != null) {
         return tenant;
       }
-      // NOTE: comment this if wanting to test against default tenant
-      throw new NoTenantHeaderException("No tenant header on request!");
+      // TODO: uncomment for production to enforce tenant selection
+      // throw new NoTenantHeaderException("No tenant header on request!");
     }
     return DEFAULT_TENANT;
   }

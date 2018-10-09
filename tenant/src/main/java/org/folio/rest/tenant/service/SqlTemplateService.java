@@ -11,6 +11,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 public class SqlTemplateService {
 
   private final static String SCHEMA_IMPORT_INITIAL = "import/initial";
+  private final static String SCHEMA_SELECT = "schema/select";
   private final static String SCHEMA = "schema";
 
   @Autowired
@@ -18,6 +19,10 @@ public class SqlTemplateService {
 
   public String templateImportSql(String schema) {
     return templateEngine.process(SCHEMA_IMPORT_INITIAL, createContext(SCHEMA, schema));
+  }
+
+  public String templateSelectSchemaSql(String schema) {
+    return templateEngine.process(SCHEMA_SELECT, createContext(SCHEMA, schema));
   }
 
   private Context createContext(String modelName, Object model) {

@@ -1,5 +1,6 @@
 package org.folio.rest.tenant.controller.advice;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import org.folio.rest.tenant.exception.TenantAlreadyExistsException;
@@ -17,6 +18,11 @@ public class TenantControllerAdvice {
 
   @ExceptionHandler(value = SQLException.class)
   public ResponseEntity<String> hasndleSQLException(SQLException exception) {
+    return new ResponseEntity<String>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  @ExceptionHandler(value = IOException.class)
+  public ResponseEntity<String> hasndleIOException(IOException exception) {
     return new ResponseEntity<String>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
