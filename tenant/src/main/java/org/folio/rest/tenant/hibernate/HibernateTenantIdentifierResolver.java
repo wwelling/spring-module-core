@@ -6,8 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.folio.rest.tenant.config.TenantConfig;
 import org.folio.rest.tenant.exception.NoTenantHeaderException;
-// TODO: uncomment to throw
-// import org.folio.rest.tenant.exception.NoTenantHeaderException;
+import org.folio.rest.tenant.storage.ThreadLocalStorage;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
@@ -34,6 +33,12 @@ public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifie
       if (tenantConfig.isForceTenant()) {
         throw new NoTenantHeaderException("No tenant header on request!");
       }
+    } else {
+      String tenant = ThreadLocalStorage.getTenant();
+      if (tenant != null) {
+        return tenant;
+      }
+      // NOTE: not enforcing tenant here
     }
     return tenantConfig.getDefaultTenant();
   }
