@@ -1,35 +1,41 @@
 package org.folio.rest.tenant.hibernate;
 
-import static org.folio.rest.tenant.TenantConstants.DEFAULT_TENANT;
-import static org.folio.rest.tenant.TenantConstants.TENANT_HEADER_NAME;
-
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.folio.rest.tenant.config.TenantConfig;
+import org.folio.rest.tenant.exception.NoTenantHeaderException;
 // TODO: uncomment to throw
 // import org.folio.rest.tenant.exception.NoTenantHeaderException;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
-public class StructureTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
+@DependsOn("hibernateSchemaService")
+public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
+
+  @Autowired
+  private TenantConfig tenantConfig;
 
   @Override
   public String resolveCurrentTenantIdentifier() {
     Optional<HttpServletRequest> request = getRequestFromContext();
     if (request.isPresent()) {
-      String tenant = request.get().getHeader(TENANT_HEADER_NAME);
+      String tenant = request.get().getHeader(tenantConfig.getHeaderName());
       if (tenant != null) {
         return tenant;
       }
-      // TODO: uncomment for production to enforce tenant selection
-      // throw new NoTenantHeaderException("No tenant header on request!");
+      if (tenantConfig.isForceTenant()) {
+        throw new NoTenantHeaderException("No tenant header on request!");
+      }
     }
-    return DEFAULT_TENANT;
+    return tenantConfig.getDefaultTenant();
   }
 
   @Override

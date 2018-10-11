@@ -6,28 +6,32 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 public abstract class TenantIntegrationHelper {
 
+  @Value("${tenant.headerName:X-Okapi-Tenant}")
+  private String tenantHeaderName;
+
   protected MockHttpServletRequestBuilder tenantGet(String tenant, String path) {
-    return get(path).header(TenantConstants.TENANT_HEADER_NAME, tenant);
+    return get(path).header(tenantHeaderName, tenant);
   }
 
   protected MockHttpServletRequestBuilder tenantPost(String tenant, String path) {
-    return post(path).header(TenantConstants.TENANT_HEADER_NAME, tenant);
+    return post(path).header(tenantHeaderName, tenant);
   }
 
   protected MockHttpServletRequestBuilder tenantPut(String tenant, String path) {
-    return put(path).header(TenantConstants.TENANT_HEADER_NAME, tenant);
+    return put(path).header(tenantHeaderName, tenant);
   }
 
   protected MockHttpServletRequestBuilder tenantPatch(String tenant, String path) {
-    return patch(path).header(TenantConstants.TENANT_HEADER_NAME, tenant);
+    return patch(path).header(tenantHeaderName, tenant);
   }
 
   protected MockHttpServletRequestBuilder tenantDelete(String tenant, String path) {
-    return delete(path).header(TenantConstants.TENANT_HEADER_NAME, tenant);
+    return delete(path).header(tenantHeaderName, tenant);
   }
 
 }

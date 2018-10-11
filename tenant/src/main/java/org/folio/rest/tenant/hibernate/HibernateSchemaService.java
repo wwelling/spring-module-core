@@ -1,4 +1,4 @@
-package org.folio.rest.tenant.service;
+package org.folio.rest.tenant.hibernate;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,21 +15,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.folio.rest.tenant.TenantConstants;
-import org.folio.rest.tenant.config.AdditionalHibernateConfig;
+import org.folio.rest.tenant.config.TenantConfig;
 import org.folio.rest.tenant.exception.TenantAlreadyExistsException;
 import org.folio.rest.tenant.exception.TenantDoesNotExistsException;
+import org.folio.rest.tenant.service.SqlTemplateService;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -40,8 +40,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 
-@Service
-public class HibernateSchemaService {
+@Service("hibernateSchemaService")
+public class HibernateSchemaService implements InitializingBean {
 
   private final static String CONNECTION_DRIVER_CLASS = "connection.driver_class";
   private final static String DIALECT = "dialect";
@@ -55,7 +55,7 @@ public class HibernateSchemaService {
   private final List<String> domainPackages = new ArrayList<String>();
 
   @Autowired
-  private AdditionalHibernateConfig additionalHibernateConfig;
+  private TenantConfig tenantConfig;
 
   @Autowired
   private SqlTemplateService sqlTemplateService;
@@ -69,17 +69,18 @@ public class HibernateSchemaService {
   @Autowired
   private ResourceLoader resourceLoader;
 
-  @PostConstruct
-  private void initialize() throws SQLException, IOException {
+  @Override
+  public void afterPropertiesSet() throws Exception {
     domainPackages.add("org.folio.rest.model");
-    for (String additionalDomainPackage : additionalHibernateConfig.getDomainPackages()) {
+    for (String additionalDomainPackage : tenantConfig.getDomainPackages()) {
       domainPackages.add(additionalDomainPackage);
     }
-    // TODO: remove this in production to avoid generating tables for public schema
-    Map<String, String> settings = getSettings(TenantConstants.DEFAULT_TENANT);
-    Connection connection = getConnection(settings);
-    initializeSchema(connection, settings);
-    connection.close();
+    if (tenantConfig.isInitializeDefaultTenant()) {
+      Map<String, String> settings = getSettings(tenantConfig.getDefaultTenant());
+      Connection connection = getConnection(settings);
+      initializeSchema(connection, settings);
+      connection.close();
+    }
   }
 
   public void createTenant(String tenant) throws SQLException, IOException {
@@ -131,7 +132,7 @@ public class HibernateSchemaService {
   private void createAdditionalSchema(Connection connection, String schema) throws SQLException, IOException {
     Statement statement = connection.createStatement();
     statement.execute(sqlTemplateService.templateSelectSchemaSql(schema));
-    for (String path : additionalHibernateConfig.getSchemaScripts()) {
+    for (String path : tenantConfig.getSchemaScripts()) {
       Resource resource = resourceLoader.getResource(path);
       File script;
       if (resource.getURI().getScheme().equals("jar")) {
