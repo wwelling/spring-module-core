@@ -76,9 +76,12 @@ public class HibernateSchemaService implements InitializingBean {
       domainPackages.add(additionalDomainPackage);
     }
     if (tenantConfig.isInitializeDefaultTenant()) {
-      Map<String, String> settings = getSettings(tenantConfig.getDefaultTenant());
+      String tenant = tenantConfig.getDefaultTenant();
+      Map<String, String> settings = getSettings(tenant);
       Connection connection = getConnection(settings);
-      initializeSchema(connection, settings);
+      if (!schemaExists(connection, tenant)) {
+        initializeSchema(connection, settings);
+      }
       connection.close();
     }
   }
