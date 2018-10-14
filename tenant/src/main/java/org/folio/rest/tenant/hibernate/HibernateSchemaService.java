@@ -106,6 +106,14 @@ public class HibernateSchemaService implements InitializingBean {
     connection.close();
   }
 
+  public boolean schemaExists(String tenant) throws SQLException {
+    Map<String, String> settings = getSettings(tenant);
+    Connection connection = getConnection(settings);
+    boolean exists = schemaExists(connection, tenant);
+    connection.close();
+    return exists;
+  }
+
   private void initializeSchema(Connection connection, Map<String, String> settings) throws SQLException, IOException {
     String schema = getSchema(settings);
     createSchema(connection, schema);
