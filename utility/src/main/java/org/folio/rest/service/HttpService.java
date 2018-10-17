@@ -17,8 +17,8 @@ public class HttpService {
   }
 
   // @formatter:off
-  public ResponseEntity<?> exchange(
-    String url, HttpMethod method, HttpEntity<?> request, Class<?> responseType, Object[] uriVariables
+  public <T> ResponseEntity<T> exchange(
+    String url, HttpMethod method, HttpEntity<?> request, Class<T> responseType, Object[] uriVariables
   ) {
   // @formatter:on
     return this.restTemplate.exchange(url, method, request, responseType, uriVariables);
