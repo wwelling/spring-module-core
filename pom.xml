@@ -23,6 +23,7 @@
   <modules>
     <module>domain</module>
     <module>tenant</module>
+    <module>utility</module>
   </modules>
 
   <packaging>pom</packaging>
