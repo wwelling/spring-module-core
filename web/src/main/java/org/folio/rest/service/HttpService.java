@@ -16,6 +16,10 @@ public class HttpService {
     this.restTemplate = restTemplateBuilder.build();
   }
 
+  public <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity<?> request, Class<T> responseType) {
+    return this.restTemplate.exchange(url, method, request, responseType, new Object[0]);
+  }
+
   // @formatter:off
   public <T> ResponseEntity<T> exchange(
     String url, HttpMethod method, HttpEntity<?> request, Class<T> responseType, Object[] uriVariables
