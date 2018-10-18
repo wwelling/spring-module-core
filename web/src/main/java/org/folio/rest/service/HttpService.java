@@ -17,7 +17,7 @@ public class HttpService {
   }
 
   public <T> ResponseEntity<T> exchange(String url, HttpMethod method, HttpEntity<?> request, Class<T> responseType) {
-    return this.restTemplate.exchange(url, method, request, responseType, new Object[0]);
+    return this.restTemplate.exchange(url, method, request, responseType, (Object[]) new String[0]);
   }
 
   // @formatter:off
