@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
-@RequestMapping("/schemas")
+@RequestMapping("/_/schemas")
 public class SchemaController {
 
   @Autowired
