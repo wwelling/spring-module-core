@@ -19,13 +19,13 @@ import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 
 public class EntityJsonSchemaGenerator {
 
-  private static final String JSON_SCHEMA_DIRECTORY = "schema";
+  private static final String JSON_SCHEMA_DIRECTORY = "ramls";
 
   public static void main(String[] args) {
 
     String path = EntityJsonSchemaGenerator.class.getClassLoader().getResource(".").getPath();
 
-    File directory = new File(path + File.separator + ".." + File.separator + JSON_SCHEMA_DIRECTORY);
+    File directory = new File(path + File.separator + ".." + File.separator + ".." + File.separator + JSON_SCHEMA_DIRECTORY);
     if (!directory.exists()) {
       directory.mkdir();
     }
