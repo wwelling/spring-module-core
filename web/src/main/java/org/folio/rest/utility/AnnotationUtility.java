@@ -1,4 +1,4 @@
-package org.folio.rest.tenant.utility;
+package org.folio.rest.utility;
 
 import java.lang.annotation.Annotation;
 
