@@ -1,6 +1,6 @@
-package org.folio.rest.tenant.resolver;
+package org.folio.rest.resolver;
 
-import org.folio.rest.tenant.annotation.TenantHeader;
+import org.folio.rest.annotation.TokenHeader;
 import org.folio.rest.utility.AnnotationUtility;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -8,17 +8,17 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-public final class TenantHeaderResolver implements HandlerMethodArgumentResolver {
+public final class TokenHeaderResolver implements HandlerMethodArgumentResolver {
 
   private final String tenantHeaderName;
 
-  public TenantHeaderResolver(String tenantHeaderName) {
+  public TokenHeaderResolver(String tenantHeaderName) {
     this.tenantHeaderName = tenantHeaderName;
   }
 
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
-    return AnnotationUtility.findMethodAnnotation(TenantHeader.class, parameter) != null;
+    return AnnotationUtility.findMethodAnnotation(TokenHeader.class, parameter) != null;
   }
 
   // @formatter:off
