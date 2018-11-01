@@ -9,7 +9,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class DefaultWebMvcConfig implements WebMvcConfigurer {
+public class TenantResolverWebMvcConfig implements WebMvcConfigurer {
 
   @Autowired
   private TenantConfig tenantConfig;
