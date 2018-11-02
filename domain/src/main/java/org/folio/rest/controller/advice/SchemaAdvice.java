@@ -20,14 +20,14 @@ public class SchemaAdvice {
   @ExceptionHandler(SchemaNotFoundException.class)
   public Errors handleSchemaNotFoundException(SchemaNotFoundException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.NOT_FOUND);
+    return ErrorUtility.buildError(exception, HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(SchemaIOException.class)
   public Errors handleSchemaIOException(SchemaIOException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }

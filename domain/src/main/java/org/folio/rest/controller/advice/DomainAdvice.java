@@ -20,14 +20,14 @@ public class DomainAdvice {
   @ExceptionHandler(ConstraintViolationException.class)
   public Errors handleConstraintViolationException(ConstraintViolationException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.BAD_REQUEST);
+    return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(DataIntegrityViolationException.class)
   public Errors handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.BAD_REQUEST);
+    return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }
 
 }
