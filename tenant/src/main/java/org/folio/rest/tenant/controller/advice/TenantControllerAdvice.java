@@ -24,35 +24,35 @@ public class TenantControllerAdvice {
   @ExceptionHandler(value = SQLException.class)
   public Errors hasndleSQLException(SQLException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = IOException.class)
   public Errors hasndleIOException(IOException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = HibernateException.class)
   public Errors hasndleHibernateException(HibernateException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ExceptionHandler(value = TenantAlreadyExistsException.class)
   public Errors hasndleTenantAlreadyExistsException(TenantAlreadyExistsException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.NO_CONTENT);
+    return ErrorUtility.buildError(exception, HttpStatus.NO_CONTENT);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(value = TenantDoesNotExistsException.class)
   public Errors hasndleTenantDoesNotExistsException(TenantDoesNotExistsException exception) {
     logger.debug(exception.getMessage(), exception);
-    return ErrorUtility.craftErrors(exception, HttpStatus.BAD_REQUEST);
+    return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }
 
 }
