@@ -2,6 +2,8 @@ package org.folio.rest.controller.advice;
 
 import org.folio.rest.controller.exception.SchemaIOException;
 import org.folio.rest.controller.exception.SchemaNotFoundException;
+import org.folio.rest.model.response.Errors;
+import org.folio.rest.utility.ErrorUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,16 +18,16 @@ public class SchemaAdvice {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(SchemaNotFoundException.class)
-  public String handleSchemaNotFoundException(SchemaNotFoundException exception) {
+  public Errors handleSchemaNotFoundException(SchemaNotFoundException exception) {
     logger.debug(exception.getMessage(), exception);
-    return exception.getMessage();
+    return ErrorUtility.craftErrors(exception, HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(SchemaIOException.class)
-  public String handleSchemaIOException(SchemaIOException exception) {
+  public Errors handleSchemaIOException(SchemaIOException exception) {
     logger.debug(exception.getMessage(), exception);
-    return exception.getMessage();
+    return ErrorUtility.craftErrors(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
 }
