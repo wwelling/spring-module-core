@@ -118,8 +118,8 @@ public class HibernateSchemaService implements InitializingBean {
     String schema = getSchema(settings);
     createSchema(connection, schema);
     createTables(settings);
-    initializeData(connection, schema);
     createAdditionalSchema(connection, schema);
+    initializeData(connection, schema);
   }
 
   private void createSchema(Connection connection, String schema) throws SQLException {
