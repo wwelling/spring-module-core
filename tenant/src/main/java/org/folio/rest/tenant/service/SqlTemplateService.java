@@ -30,7 +30,11 @@ public class SqlTemplateService {
     return templateEngine.process(SCHEMA_SELECT + DOT + platform, createContext(SCHEMA, schema));
   }
 
-  private Context createContext(String modelName, Object model) {
+  public String templateInitSql(String prefix, String name, Object model) {
+    return templateEngine.process(prefix + DOT + platform, createContext(name, model));
+  }
+
+  public Context createContext(String modelName, Object model) {
     Context ctx = new Context(Locale.getDefault());
     ctx.setVariable(modelName, model);
     return ctx;

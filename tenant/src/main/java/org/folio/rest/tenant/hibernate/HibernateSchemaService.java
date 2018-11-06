@@ -69,6 +69,9 @@ public class HibernateSchemaService implements InitializingBean {
   @Autowired
   private ResourceLoader resourceLoader;
 
+  @Autowired(required = false)
+  private List<HibernateTenantInit> hibernateTenantInitializations = new ArrayList<HibernateTenantInit>();
+
   @Override
   public void afterPropertiesSet() throws Exception {
     domainPackages.add("org.folio.rest.model");
@@ -120,6 +123,9 @@ public class HibernateSchemaService implements InitializingBean {
     createTables(settings);
     createAdditionalSchema(connection, schema);
     initializeData(connection, schema);
+    for (HibernateTenantInit hibernateTenantInitialization : hibernateTenantInitializations) {
+      hibernateTenantInitialization.initialize(connection, schema);
+    }
   }
 
   private void createSchema(Connection connection, String schema) throws SQLException {
