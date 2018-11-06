@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 public class ErrorUtility {
 
   public static Errors buildError(Exception exception, HttpStatus status) {
-    return buildError(exception.getMessage(), exception.getClass().getSimpleName(), status.toString());
+    return buildError(exception.getLocalizedMessage(), exception.getClass().getSimpleName(), status.toString());
   }
 
   public static Errors buildError(String message, String type, String code) {
