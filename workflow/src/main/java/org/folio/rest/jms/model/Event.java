@@ -1,5 +1,6 @@
 package org.folio.rest.jms.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
-public class Event {
+public class Event implements Serializable {
+
+  private static final long serialVersionUID = -4950303823935320877L;
 
   private String triggerId;
 
@@ -30,6 +33,10 @@ public class Event {
 
   private List<String> taskIds;
 
+  public Event() {
+    super();
+  }
+
   // @formatter:off
   public Event(
     String triggerId,
@@ -40,6 +47,7 @@ public class Event {
     String path
   ) {
   // @formatter:on
+    this();
     this.triggerId = triggerId;
     this.triggerType = triggerType;
     this.pathPattern = pathPattern;
