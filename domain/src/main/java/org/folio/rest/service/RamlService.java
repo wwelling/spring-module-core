@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.folio.rest.controller.exception.SchemaNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -11,38 +12,30 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Service
-public class SchemaService {
+public class RamlService {
 
   @Autowired
   private ResourcePatternResolver resolver;
 
-  @Autowired
-  private ObjectMapper mapper;
-
-  public List<String> getSchemas() throws IOException {
-    List<String> schemas = new ArrayList<>();
-    Resource[] resources = resolver.getResources("classpath:ramls/*.json");
+  public List<String> getRamls() throws IOException {
+    List<String> ramls = new ArrayList<>();
+    Resource[] resources = resolver.getResources("classpath:ramls/*.raml");
     for (Resource resource : resources) {
       String name = resource.getFilename();
-      schemas.add(name);
+      ramls.add(name);
     }
-    return schemas;
+    return ramls;
   }
 
-  public JsonNode getSchemaByName(@PathVariable String name) throws IOException {
+  public String getRamlByName(@PathVariable String name) throws IOException {
     Resource resource = resolver.getResource("classpath:ramls/" + name);
     if (resource.exists()) {
-      if (resource.isFile()) {
-        return mapper.readValue(resource.getFile(), JsonNode.class);
-      } else {
-        return mapper.readValue(resource.getInputStream(), JsonNode.class);
+      if (resource.isFile() && resource.getFilename().endsWith(".raml")) {
+        return IOUtils.toString(resource.getInputStream(), "UTF-8");
       }
     }
-    throw new SchemaNotFoundException("Schema " + name + " not found");
+    throw new SchemaNotFoundException("RAML " + name + " not found");
   }
 
 }
