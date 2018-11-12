@@ -33,6 +33,8 @@ public class RamlService {
     Resource[] resources = resolver.getResources("classpath:ramls/*.raml");
     for (Resource resource : resources) {
       String name = resource.getFilename();
+      // validate RAML
+      YAML_MAPPER.readValue(resource.getInputStream(), JsonNode.class);
       ramls.add(name);
     }
     return ramls;
@@ -40,10 +42,8 @@ public class RamlService {
 
   public JsonNode getRamlByName(@PathVariable String name, String okapiUrl) throws IOException {
     Resource resource = resolver.getResource("classpath:ramls/" + name);
-    if (resource.exists()) {
-      if (resource.isFile() && resource.getFilename().endsWith(".raml")) {
-        return replaceReferences(IOUtils.toString(resource.getInputStream(), "UTF-8"), okapiUrl);
-      }
+    if (resource.exists() && resource.getFilename().endsWith(".raml")) {
+      return replaceReferences(IOUtils.toString(resource.getInputStream(), "UTF-8"), okapiUrl);
     }
     throw new SchemaNotFoundException("RAML " + name + " not found");
   }

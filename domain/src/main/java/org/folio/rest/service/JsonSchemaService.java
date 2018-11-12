@@ -32,7 +32,8 @@ public class JsonSchemaService {
     Resource[] resources = resolver.getResources("classpath:ramls/*.json");
     for (Resource resource : resources) {
       String name = resource.getFilename();
-      mapper.readValue(resource.getFile(), JsonNode.class);
+      // validate JSON
+      mapper.readValue(resource.getInputStream(), JsonNode.class);
       schemas.add(name);
     }
     return schemas;
@@ -53,8 +54,7 @@ public class JsonSchemaService {
     while (matcher.find()) {
       String ref = matcher.group(1).substring(matcher.group(1).lastIndexOf("/") + 1);
       if (!ref.startsWith("#")) {
-        matcher.appendReplacement(sb,
-            Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema/" + ref + "\""));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema/" + ref + "\""));
       }
     }
     matcher.appendTail(sb);
