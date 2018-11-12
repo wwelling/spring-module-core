@@ -8,8 +8,11 @@ import org.folio.rest.service.RamlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/_/raml")
@@ -28,9 +31,9 @@ public class RamlController {
   }
 
   @GetMapping("/{name}")
-  public String getRamlByName(@PathVariable String name) throws SchemaIOException {
+  public JsonNode getRamlByName(@PathVariable String name, @RequestHeader("x-okapi-url") String okapiUrl) throws SchemaIOException {
     try {
-      return ramlService.getRamlByName(name);
+      return ramlService.getRamlByName(name, okapiUrl);
     } catch (IOException e) {
       throw new SchemaIOException(String.format("Unable to get RAML %s!", name), e);
     }

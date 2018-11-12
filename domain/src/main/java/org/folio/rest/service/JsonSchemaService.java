@@ -3,6 +3,8 @@ package org.folio.rest.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.folio.rest.controller.exception.SchemaNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class SchemaService {
+public class JsonSchemaService {
+
+  private static final Pattern REF_MATCH_PATTERN = Pattern.compile("\\\"\\$ref\\\"\\s*:\\s*\\\"(.*?)\\\"");
 
   @Autowired
   private ResourcePatternResolver resolver;
@@ -28,21 +32,33 @@ public class SchemaService {
     Resource[] resources = resolver.getResources("classpath:ramls/*.json");
     for (Resource resource : resources) {
       String name = resource.getFilename();
+      mapper.readValue(resource.getFile(), JsonNode.class);
       schemas.add(name);
     }
     return schemas;
   }
 
-  public JsonNode getSchemaByName(@PathVariable String name) throws IOException {
+  public JsonNode getSchemaByName(@PathVariable String name, String okapiUrl) throws IOException {
     Resource resource = resolver.getResource("classpath:ramls/" + name);
     if (resource.exists()) {
-      if (resource.isFile()) {
-        return mapper.readValue(resource.getFile(), JsonNode.class);
-      } else {
-        return mapper.readValue(resource.getInputStream(), JsonNode.class);
-      }
+      return replaceReferences(mapper.readValue(resource.getInputStream(), JsonNode.class), okapiUrl);
     }
     throw new SchemaNotFoundException("Schema " + name + " not found");
+  }
+
+  private JsonNode replaceReferences(JsonNode schemaNode, String okapiUrl) throws IOException {
+    String schema = schemaNode.toString();
+    Matcher matcher = REF_MATCH_PATTERN.matcher(schema);
+    StringBuffer sb = new StringBuffer(schema.length());
+    while (matcher.find()) {
+      String ref = matcher.group(1).substring(matcher.group(1).lastIndexOf("/") + 1);
+      if (!ref.startsWith("#")) {
+        matcher.appendReplacement(sb,
+            Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema/" + ref + "\""));
+      }
+    }
+    matcher.appendTail(sb);
+    return mapper.readValue(sb.toString(), JsonNode.class);
   }
 
 }
