@@ -1,6 +1,7 @@
 package org.folio.rest.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,10 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
-public class RamlService {
+public class RamlsService {
 
   private static final Pattern INCLUDE_MATCH_PATTERN = Pattern.compile("(?<=!include ).*");
 
@@ -32,23 +32,23 @@ public class RamlService {
     return ramls;
   }
 
-  public String getRamlByName(@PathVariable String name, String okapiUrl) throws IOException {
-    Resource resource = resolver.getResource("classpath:ramls/" + name);
-    if (resource.exists() && resource.getFilename().endsWith(".raml")) {
-      return replaceReferences(IOUtils.toString(resource.getInputStream(), "UTF-8"), okapiUrl);
+  public String getRamlByPath(String path, String okapiUrl) throws IOException {
+    Resource resource = resolver.getResource("classpath:ramls/" + path);
+    if (resource.exists()) {
+      return replaceReferences(IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name()), okapiUrl);
     }
-    throw new SchemaNotFoundException("RAML " + name + " not found");
+    throw new SchemaNotFoundException("RAML " + path + " not found");
   }
 
   private String replaceReferences(String raml, String okapiUrl) throws IOException {
     Matcher matcher = INCLUDE_MATCH_PATTERN.matcher(raml);
     StringBuffer sb = new StringBuffer(raml.length());
     while (matcher.find()) {
-      String ref = matcher.group(0).substring(matcher.group(0).lastIndexOf("/") + 1);
+      String ref = matcher.group(0).substring(matcher.group(0).lastIndexOf("ramls/") + 1);
       if (ref.endsWith(".raml")) {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/raml/" + ref));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/ramls?=" + ref));
       } else {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/jsonSchema/" + ref));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/jsonSchemas?=" + ref));
       }
     }
     matcher.appendTail(sb);

@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class JsonSchemaService {
+public class JsonSchemasService {
 
   private static final Pattern REF_MATCH_PATTERN = Pattern.compile("\\\"\\$ref\\\"\\s*:\\s*\\\"(.*?)\\\"");
 
@@ -39,12 +38,12 @@ public class JsonSchemaService {
     return schemas;
   }
 
-  public String getSchemaByName(@PathVariable String name, String okapiUrl) throws IOException {
-    Resource resource = resolver.getResource("classpath:ramls/" + name);
+  public String getSchemaByPath(String path, String okapiUrl) throws IOException {
+    Resource resource = resolver.getResource("classpath:ramls/" + path);
     if (resource.exists()) {
       return replaceReferences(mapper.readValue(resource.getInputStream(), JsonNode.class), okapiUrl);
     }
-    throw new SchemaNotFoundException("Schema " + name + " not found");
+    throw new SchemaNotFoundException("Schema " + path + " not found");
   }
 
   private String replaceReferences(JsonNode schemaNode, String okapiUrl) throws IOException {
@@ -53,9 +52,10 @@ public class JsonSchemaService {
     StringBuffer sb = new StringBuffer(schema.length());
     while (matcher.find()) {
       String matchRef = matcher.group(1);
-      String ref = matchRef.substring(matchRef.lastIndexOf("/") + 1);
+      String ref = matchRef.substring(matchRef.lastIndexOf("ramls/") + 1);
       if (!matchRef.startsWith("#")) {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema/" + ref + "\""));
+        matcher.appendReplacement(sb,
+            Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema?=" + ref + "\""));
       }
     }
     matcher.appendTail(sb);
