@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.folio.rest.controller.exception.SchemaIOException;
 import org.folio.rest.service.JsonSchemasService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,11 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/_/jsonSchemas")
 public class JsonSchemasController {
 
+  private static final String CONTENT_TYPE_HEADER = "Content-Type";
+  private static final String APPLICATION_SCHEMA_JSON = "application/schema+json";
+  private static final String APPLICATION_JSON = "application/json";
+
   @Autowired
   private JsonSchemasService jsonSchemasService;
 
   @GetMapping
-  public Object getSchemas(
+  public ResponseEntity<Object> getSchemas(
   // @formatter:off
     @RequestParam(value = "path", required = false) Optional<String> path,
     @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
@@ -29,12 +34,13 @@ public class JsonSchemasController {
     try {
       if (path.isPresent()) {
         try {
-          return jsonSchemasService.getSchemaByPath(path.get(), okapiUrl);
+          String schema = jsonSchemasService.getSchemaByPath(path.get(), okapiUrl);
+          return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_SCHEMA_JSON).body(schema);
         } catch (IOException e) {
           throw new SchemaIOException(String.format("Unable to get JSON Schema %s!", path), e);
         }
       } else {
-        return jsonSchemasService.getSchemas();
+        return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_JSON).body(jsonSchemasService.getSchemas());
       }
     } catch (IOException e) {
       throw new SchemaIOException("Unable to get JSON Schemas!", e);
