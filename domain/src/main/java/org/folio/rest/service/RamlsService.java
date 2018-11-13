@@ -19,6 +19,9 @@ public class RamlsService {
 
   private static final Pattern INCLUDE_MATCH_PATTERN = Pattern.compile("(?<=!include ).*");
 
+  private static final String RAMLS_PATH = "ramls/";
+  private static final String RAML_EXT = ".raml";
+
   @Autowired
   private ResourcePatternResolver resolver;
 
@@ -44,11 +47,11 @@ public class RamlsService {
     Matcher matcher = INCLUDE_MATCH_PATTERN.matcher(raml);
     StringBuffer sb = new StringBuffer(raml.length());
     while (matcher.find()) {
-      String ref = matcher.group(0).substring(matcher.group(0).lastIndexOf("ramls/") + 1);
-      if (ref.endsWith(".raml")) {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/ramls?=" + ref));
+      String path = matcher.group(0).substring(matcher.group(0).lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
+      if (path.endsWith(RAML_EXT)) {
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/ramls?path=" + path));
       } else {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/jsonSchemas?=" + ref));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/jsonSchemas?path=" + path));
       }
     }
     matcher.appendTail(sb);

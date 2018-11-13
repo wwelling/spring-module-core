@@ -20,6 +20,9 @@ public class JsonSchemasService {
 
   private static final Pattern REF_MATCH_PATTERN = Pattern.compile("\\\"\\$ref\\\"\\s*:\\s*\\\"(.*?)\\\"");
 
+  private static final String RAMLS_PATH = "ramls/";
+  private static final String HASH_TAG = "#";
+
   @Autowired
   private ResourcePatternResolver resolver;
 
@@ -52,10 +55,10 @@ public class JsonSchemasService {
     StringBuffer sb = new StringBuffer(schema.length());
     while (matcher.find()) {
       String matchRef = matcher.group(1);
-      String ref = matchRef.substring(matchRef.lastIndexOf("ramls/") + 1);
-      if (!matchRef.startsWith("#")) {
+      String path = matchRef.substring(matchRef.lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
+      if (!matchRef.startsWith(HASH_TAG)) {
         matcher.appendReplacement(sb,
-            Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchema?=" + ref + "\""));
+            Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchemas?path=" + path + "\""));
       }
     }
     matcher.appendTail(sb);
