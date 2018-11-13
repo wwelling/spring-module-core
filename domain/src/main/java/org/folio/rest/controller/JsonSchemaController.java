@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 @RestController
 @RequestMapping("/_/jsonSchema")
 public class JsonSchemaController {
@@ -30,8 +28,13 @@ public class JsonSchemaController {
     }
   }
 
-  @GetMapping("/{name}")
-  public JsonNode getSchemaByName(@PathVariable String name, @RequestHeader("x-okapi-url") String okapiUrl) throws SchemaIOException {
+  @GetMapping(value = "/{name}", produces = "application/json")
+  public String getSchemaByName(
+  // @formatter:off
+    @PathVariable String name,
+    @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
+  // @formatter:on
+  ) throws SchemaIOException {
     try {
       return jsonSchemaService.getSchemaByName(name, okapiUrl);
     } catch (IOException e) {

@@ -39,7 +39,7 @@ public class JsonSchemaService {
     return schemas;
   }
 
-  public JsonNode getSchemaByName(@PathVariable String name, String okapiUrl) throws IOException {
+  public String getSchemaByName(@PathVariable String name, String okapiUrl) throws IOException {
     Resource resource = resolver.getResource("classpath:ramls/" + name);
     if (resource.exists()) {
       return replaceReferences(mapper.readValue(resource.getInputStream(), JsonNode.class), okapiUrl);
@@ -47,7 +47,7 @@ public class JsonSchemaService {
     throw new SchemaNotFoundException("Schema " + name + " not found");
   }
 
-  private JsonNode replaceReferences(JsonNode schemaNode, String okapiUrl) throws IOException {
+  private String replaceReferences(JsonNode schemaNode, String okapiUrl) throws IOException {
     String schema = schemaNode.toString();
     Matcher matcher = REF_MATCH_PATTERN.matcher(schema);
     StringBuffer sb = new StringBuffer(schema.length());
@@ -59,7 +59,7 @@ public class JsonSchemaService {
       }
     }
     matcher.appendTail(sb);
-    return mapper.readValue(sb.toString(), JsonNode.class);
+    return sb.toString();
   }
 
 }

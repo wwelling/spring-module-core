@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 @RestController
 @RequestMapping("/_/raml")
 public class RamlController {
@@ -30,8 +28,13 @@ public class RamlController {
     }
   }
 
-  @GetMapping("/{name}")
-  public JsonNode getRamlByName(@PathVariable String name, @RequestHeader("x-okapi-url") String okapiUrl) throws SchemaIOException {
+  @GetMapping(value = "/{name}", produces = "application/raml+yaml")
+  public String getRamlByName(
+  // @formatter:off
+    @PathVariable String name,
+    @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
+  // @formatter:on
+  ) throws SchemaIOException {
     try {
       return ramlService.getRamlByName(name, okapiUrl);
     } catch (IOException e) {

@@ -14,16 +14,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 @Service
 public class RamlService {
 
   private static final Pattern INCLUDE_MATCH_PATTERN = Pattern.compile("(?<=!include ).*");
-
-  private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
 
   @Autowired
   private ResourcePatternResolver resolver;
@@ -33,14 +27,12 @@ public class RamlService {
     Resource[] resources = resolver.getResources("classpath:ramls/*.raml");
     for (Resource resource : resources) {
       String name = resource.getFilename();
-      // validate RAML
-      YAML_MAPPER.readValue(resource.getInputStream(), JsonNode.class);
       ramls.add(name);
     }
     return ramls;
   }
 
-  public JsonNode getRamlByName(@PathVariable String name, String okapiUrl) throws IOException {
+  public String getRamlByName(@PathVariable String name, String okapiUrl) throws IOException {
     Resource resource = resolver.getResource("classpath:ramls/" + name);
     if (resource.exists() && resource.getFilename().endsWith(".raml")) {
       return replaceReferences(IOUtils.toString(resource.getInputStream(), "UTF-8"), okapiUrl);
@@ -48,7 +40,7 @@ public class RamlService {
     throw new SchemaNotFoundException("RAML " + name + " not found");
   }
 
-  private JsonNode replaceReferences(String raml, String okapiUrl) throws IOException {
+  private String replaceReferences(String raml, String okapiUrl) throws IOException {
     Matcher matcher = INCLUDE_MATCH_PATTERN.matcher(raml);
     StringBuffer sb = new StringBuffer(raml.length());
     while (matcher.find()) {
@@ -60,7 +52,7 @@ public class RamlService {
       }
     }
     matcher.appendTail(sb);
-    return YAML_MAPPER.readValue(sb.toString(), JsonNode.class);
+    return sb.toString();
   }
 
 }
