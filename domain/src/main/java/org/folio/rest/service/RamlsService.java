@@ -47,7 +47,10 @@ public class RamlsService {
     Matcher matcher = INCLUDE_MATCH_PATTERN.matcher(raml);
     StringBuffer sb = new StringBuffer(raml.length());
     while (matcher.find()) {
-      String path = matcher.group(0).substring(matcher.group(0).lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
+      String path = matcher.group(0);
+      if (path.contains(RAMLS_PATH)) {
+        path = path.substring(path.lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
+      }
       if (path.endsWith(RAML_EXT)) {
         matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/ramls?path=" + path));
       } else {
