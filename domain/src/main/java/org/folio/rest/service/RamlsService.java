@@ -29,8 +29,7 @@ public class RamlsService {
     List<String> ramls = new ArrayList<>();
     Resource[] resources = resolver.getResources("classpath:ramls/*.raml");
     for (Resource resource : resources) {
-      String name = resource.getFilename();
-      ramls.add(name);
+      ramls.add(resource.getFilename());
     }
     return ramls;
   }

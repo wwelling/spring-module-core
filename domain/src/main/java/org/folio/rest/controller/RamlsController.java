@@ -42,7 +42,6 @@ public class RamlsController {
         } catch (IOException e) {
           throw new SchemaIOException(String.format("Unable to get RAML %s!", path), e);
         }
-
       } else {
         return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_JSON).body(ramlsService.getRamls());
       }

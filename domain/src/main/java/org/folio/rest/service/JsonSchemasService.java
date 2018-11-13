@@ -33,10 +33,7 @@ public class JsonSchemasService {
     List<String> schemas = new ArrayList<>();
     Resource[] resources = resolver.getResources("classpath:ramls/*.json");
     for (Resource resource : resources) {
-      String name = resource.getFilename();
-      // validate JSON
-      mapper.readValue(resource.getInputStream(), JsonNode.class);
-      schemas.add(name);
+      schemas.add(resource.getFilename());
     }
     return schemas;
   }
