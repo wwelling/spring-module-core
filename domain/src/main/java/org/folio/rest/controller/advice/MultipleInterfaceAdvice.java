@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class SchemaAdvice {
+public class MultipleInterfaceAdvice {
 
-  private static final Logger logger = LoggerFactory.getLogger(SchemaAdvice.class);
+  private static final Logger logger = LoggerFactory.getLogger(MultipleInterfaceAdvice.class);
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(SchemaNotFoundException.class)
