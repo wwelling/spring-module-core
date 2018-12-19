@@ -32,7 +32,7 @@ public class RamlsController {
     HttpServletResponse response,
     @RequestParam(value = "path", required = false) Optional<String> path,
     @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
-  // @formatter:on    
+  // @formatter:on
   ) throws SchemaIOException {
     try {
       if (path.isPresent()) {
