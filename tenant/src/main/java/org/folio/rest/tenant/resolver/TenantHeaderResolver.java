@@ -23,7 +23,7 @@ public final class TenantHeaderResolver implements HandlerMethodArgumentResolver
 
   // @formatter:off
   @Override
-  public Object resolveArgument(  
+  public Object resolveArgument(
     MethodParameter parameter,
     ModelAndViewContainer mavContainer,
     NativeWebRequest webRequest,
