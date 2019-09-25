@@ -31,6 +31,7 @@ import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -51,7 +52,8 @@ public class HibernateSchemaService implements InitializingBean {
   private final static String HIBERNATE_CONNECTION_USERNAME = "hibernate.connection.username";
   private final static String HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
   private final static String HIBERNATE_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
-
+  
+  @Value("${tenant.domain-packages}") 
   private final List<String> domainPackages = new ArrayList<String>();
 
   @Autowired
@@ -74,7 +76,9 @@ public class HibernateSchemaService implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    domainPackages.add("org.folio.rest.model");
+    if(domainPackages.isEmpty()) {
+      domainPackages.add("org.folio.rest.model");
+    }
     for (String additionalDomainPackage : tenantConfig.getDomainPackages()) {
       domainPackages.add(additionalDomainPackage);
     }
