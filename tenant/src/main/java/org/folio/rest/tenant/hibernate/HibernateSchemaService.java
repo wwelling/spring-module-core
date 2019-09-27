@@ -53,7 +53,6 @@ public class HibernateSchemaService implements InitializingBean {
   private final static String HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
   private final static String HIBERNATE_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
   
-  @Value("${tenant.domain-packages}") 
   private final List<String> domainPackages = new ArrayList<String>();
 
   @Autowired
@@ -76,9 +75,7 @@ public class HibernateSchemaService implements InitializingBean {
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    if(domainPackages.isEmpty()) {
-      domainPackages.add("org.folio.rest.model");
-    }
+    domainPackages.add("org.folio.rest.model");
     for (String additionalDomainPackage : tenantConfig.getDomainPackages()) {
       domainPackages.add(additionalDomainPackage);
     }

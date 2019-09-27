@@ -3,6 +3,7 @@ package org.folio.rest.tenant.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -59,11 +60,11 @@ public class TenantConfig {
     }
 
     public List<String> getDomainPackages() {
-        return domainPackages;
+      return domainPackages;
     }
-
+    
     public void setDomainPackages(List<String> domainPackages) {
-        this.domainPackages = domainPackages;
+      this.domainPackages = domainPackages;
     }
 
     public List<String> getSchemaScripts() {
