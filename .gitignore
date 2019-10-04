@@ -59,5 +59,6 @@ hs_err_pid*
 
 *.rdb*
 
-
 .DS_Store
+
+.vscode*
