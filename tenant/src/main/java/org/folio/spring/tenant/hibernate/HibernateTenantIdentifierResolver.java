@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.folio.spring.tenant.config.TenantConfig;
 import org.folio.spring.tenant.exception.NoTenantHeaderException;
+import org.folio.spring.tenant.properties.Tenant;
 import org.folio.spring.tenant.storage.ThreadLocalStorage;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +20,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
 
   @Autowired
-  private TenantConfig tenantConfig;
+  private Tenant tenantProperties;
 
   @Override
   public String resolveCurrentTenantIdentifier() {
     Optional<HttpServletRequest> request = getRequestFromContext();
     if (request.isPresent()) {
-      String tenant = request.get().getHeader(tenantConfig.getHeaderName());
+      String tenant = request.get().getHeader(tenantProperties.getHeaderName());
       if (tenant != null) {
         return tenant;
       }
-      if (tenantConfig.isForceTenant()) {
+      if (tenantProperties.isForceTenant()) {
         throw new NoTenantHeaderException("No tenant header on request!");
       }
     } else {
@@ -40,7 +40,7 @@ public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifie
       }
       // NOTE: not enforcing tenant here
     }
-    return tenantConfig.getDefaultTenant();
+    return tenantProperties.getDefaultTenant();
   }
 
   @Override

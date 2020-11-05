@@ -1,4 +1,4 @@
-package org.folio.spring.tenant.config;
+package org.folio.spring.tenant.properties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "tenant")
-public class TenantConfig {
+public class Tenant {
 
     private String headerName = "X-Okapi-Tenant";
 
@@ -22,7 +22,7 @@ public class TenantConfig {
 
     private List<String> schemaScripts = new ArrayList<String>();
 
-    public TenantConfig() {
+    public Tenant() {
 
     }
 
