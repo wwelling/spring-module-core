@@ -2,6 +2,7 @@ package org.folio.spring.tenant.hibernate;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.DataSource;
 
@@ -42,13 +43,14 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
   }
 
   @Override
-  @SuppressWarnings("squid:S2095")
   public Connection getConnection(String tenant) throws SQLException {
     final Connection connection = getAnyConnection();
     try {
       switch (platform) {
         case "h2":
-          connection.createStatement().execute("USE " + toSchema(tenant));
+          try (Statement statement = connection.createStatement()) {
+            statement.execute("USE " + toSchema(tenant));
+          }
           break;
         case "postgres":
           connection.setSchema(toSchema(tenant));
@@ -67,7 +69,9 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
     try {
       switch (platform) {
         case "h2":
-          connection.createStatement().execute("USE " + toSchema(tenantProperties.getDefaultTenant()));
+          try (Statement statement = connection.createStatement()) {
+            statement.execute("USE " + toSchema(tenantProperties.getDefaultTenant()));
+          }
           break;
         case "postgres":
           connection.setSchema(toSchema(tenantProperties.getDefaultTenant()));
@@ -76,8 +80,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException(
-          "Could not alter JDBC connection to use schema [" + toSchema(tenantProperties.getDefaultTenant()) + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + toSchema(tenantProperties.getDefaultTenant()) + "]", e);
     } finally {
       connection.close();
     }
