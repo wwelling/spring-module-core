@@ -2,7 +2,7 @@ package org.folio.spring.controller.advice;
 
 import org.folio.spring.controller.exception.SchemaIOException;
 import org.folio.spring.controller.exception.SchemaNotFoundException;
-import org.folio.spring.model.response.Errors;
+import org.folio.spring.model.response.ResponseErrors;
 import org.folio.spring.utility.ErrorUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,14 @@ public class MultipleInterfaceAdvice {
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(SchemaNotFoundException.class)
-  public Errors handleSchemaNotFoundException(SchemaNotFoundException exception) {
+  public ResponseErrors handleSchemaNotFoundException(SchemaNotFoundException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.NOT_FOUND);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(SchemaIOException.class)
-  public Errors handleSchemaIOException(SchemaIOException exception) {
+  public ResponseErrors handleSchemaIOException(SchemaIOException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }

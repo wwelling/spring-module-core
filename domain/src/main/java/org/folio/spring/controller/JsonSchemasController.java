@@ -30,15 +30,11 @@ public class JsonSchemasController {
     @RequestParam(value = "path", required = false) Optional<String> path,
     @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
   // @formatter:on
-  ) throws SchemaIOException {
+  ) {
     try {
       if (path.isPresent()) {
-        try {
-          String schema = jsonSchemasService.getSchemaByPath(path.get(), okapiUrl);
-          return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_SCHEMA_JSON).body(schema);
-        } catch (IOException e) {
-          throw new SchemaIOException(String.format("Unable to get JSON Schema %s!", path), e);
-        }
+        String schema = jsonSchemasService.getSchemaByPath(path.get(), okapiUrl);
+        return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_SCHEMA_JSON).body(schema);
       } else {
         return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_JSON).body(jsonSchemasService.getSchemas());
       }

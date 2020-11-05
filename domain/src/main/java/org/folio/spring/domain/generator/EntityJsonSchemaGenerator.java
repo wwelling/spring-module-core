@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.persistence.Entity;
 
+import org.folio.spring.controller.exception.SchemaIOException;
+import org.folio.spring.controller.exception.SchemaNotFoundException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -43,7 +45,7 @@ public class EntityJsonSchemaGenerator {
       try {
         objectWriter.writeValue(jsonFile, jsonSchema);
       } catch (IOException e) {
-        throw new RuntimeException("Unable to write jsonschema for " + entity.getName(), e);
+        throw new SchemaIOException("Unable to write jsonschema for " + entity.getName(), e);
       }
     }
   }
@@ -57,7 +59,7 @@ public class EntityJsonSchemaGenerator {
       try {
         entities.add(Class.forName(beanDefinition.getBeanClassName()));
       } catch (ClassNotFoundException e) {
-        throw new RuntimeException("Unable to find class for " + beanDefinition.getBeanClassName(), e);
+        throw new SchemaNotFoundException("Unable to find class for " + beanDefinition.getBeanClassName(), e);
       }
     }
     return entities;

@@ -46,7 +46,7 @@ public class JsonSchemasService {
     throw new SchemaNotFoundException("Schema " + path + " not found");
   }
 
-  private String replaceReferences(JsonNode schemaNode, String okapiUrl) throws IOException {
+  private String replaceReferences(JsonNode schemaNode, String okapiUrl) {
     String schema = schemaNode.toString();
     Matcher matcher = REF_MATCH_PATTERN.matcher(schema);
     StringBuffer sb = new StringBuffer(schema.length());

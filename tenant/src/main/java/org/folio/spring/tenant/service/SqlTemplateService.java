@@ -11,10 +11,10 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 @Service
 public class SqlTemplateService {
 
-  private final static String SCHEMA_IMPORT_INITIAL = "import/initial";
-  private final static String SCHEMA_SELECT = "schema/select";
-  private final static String SCHEMA = "schema";
-  private final static String DOT = ".";
+  private static final String SCHEMA_IMPORT_INITIAL = "import/initial";
+  private static final String SCHEMA_SELECT = "schema/select";
+  private static final String SCHEMA = "schema";
+  private static final String DOT = ".";
 
   @Value("${spring.datasource.platform:h2}")
   private String platform;

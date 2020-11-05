@@ -1,6 +1,6 @@
 package org.folio.spring.controller.advice;
 
-import org.folio.spring.model.response.Errors;
+import org.folio.spring.model.response.ResponseErrors;
 import org.folio.spring.utility.ErrorUtility;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -18,14 +18,14 @@ public class DomainAdvice {
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(ConstraintViolationException.class)
-  public Errors handleConstraintViolationException(ConstraintViolationException exception) {
+  public ResponseErrors handleConstraintViolationException(ConstraintViolationException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public Errors handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+  public ResponseErrors handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }

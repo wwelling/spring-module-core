@@ -8,4 +8,8 @@ public class SchemaNotFoundException extends RuntimeException {
     super(message);
   }
 
+  public SchemaNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
 }

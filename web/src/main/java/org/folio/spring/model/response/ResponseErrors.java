@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "errors", "total_records" })
-public class Errors {
+public class ResponseErrors {
 
   @JsonProperty("errors")
   @Valid
@@ -39,7 +39,7 @@ public class Errors {
     this.errors = errors;
   }
 
-  public Errors withErrors(List<Error> errors) {
+  public ResponseErrors withErrors(List<Error> errors) {
     this.errors = errors;
     return this;
   }
@@ -54,7 +54,7 @@ public class Errors {
     this.totalRecords = totalRecords;
   }
 
-  public Errors withTotalRecords(Integer totalRecords) {
+  public ResponseErrors withTotalRecords(Integer totalRecords) {
     this.totalRecords = totalRecords;
     return this;
   }
@@ -69,7 +69,7 @@ public class Errors {
     this.additionalProperties.put(name, value);
   }
 
-  public Errors withAdditionalProperty(String name, Object value) {
+  public ResponseErrors withAdditionalProperty(String name, Object value) {
     this.additionalProperties.put(name, value);
     return this;
   }

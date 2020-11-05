@@ -24,9 +24,6 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 @Configuration
 public class HibernateMultiTenantConfig {
 
-  @Autowired
-  private JpaProperties jpaProperties;
-
   @Bean
   public JpaVendorAdapter jpaVendorAdapter() {
     return new HibernateJpaVendorAdapter();
@@ -37,6 +34,7 @@ public class HibernateMultiTenantConfig {
   // @formatter:off
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(
     DataSource dataSource,
+    JpaProperties jpaProperties,
     MultiTenantConnectionProvider multiTenantConnectionProvider,
     CurrentTenantIdentifierResolver currentTenantIdentifierResolver
   ) {

@@ -33,15 +33,11 @@ public class RamlsController {
     @RequestParam(value = "path", required = false) Optional<String> path,
     @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl
   // @formatter:on
-  ) throws SchemaIOException {
+  ) {
     try {
       if (path.isPresent()) {
-        try {
-          String raml = ramlsService.getRamlByPath(path.get(), okapiUrl);
-          return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_RAML_YAML).body(raml);
-        } catch (IOException e) {
-          throw new SchemaIOException(String.format("Unable to get RAML %s!", path), e);
-        }
+        String raml = ramlsService.getRamlByPath(path.get(), okapiUrl);
+        return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_RAML_YAML).body(raml);
       } else {
         return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_JSON).body(ramlsService.getRamls());
       }
