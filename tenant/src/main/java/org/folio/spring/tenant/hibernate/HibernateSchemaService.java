@@ -86,40 +86,39 @@ public class HibernateSchemaService implements InitializingBean {
     if (tenantProperties.isInitializeDefaultTenant()) {
       String tenant = tenantProperties.getDefaultTenant();
       Map<String, String> settings = getSettings(tenant);
-      Connection connection = getConnection(settings);
-      if (!schemaExists(connection, tenant)) {
-        initializeSchema(connection, settings);
+      try (Connection connection = getConnection(settings)) {
+        if (!schemaExists(connection, tenant)) {
+          initializeSchema(connection, settings);
+        }
       }
-      connection.close();
     }
   }
 
   public void createTenant(String tenant) throws SQLException, IOException {
     Map<String, String> settings = getSettings(tenant);
-    Connection connection = getConnection(settings);
-    if (schemaExists(connection, tenant)) {
-      throw new TenantAlreadyExistsException("Tenant already exists: " + tenant);
+    try (Connection connection = getConnection(settings)) {
+      if (schemaExists(connection, tenant)) {
+        throw new TenantAlreadyExistsException("Tenant already exists: " + tenant);
+      }
+      initializeSchema(connection, settings);
     }
-    initializeSchema(connection, settings);
-    connection.close();
   }
 
   public void deleteTenant(String tenant) throws SQLException {
     Map<String, String> settings = getSettings(tenant);
-    Connection connection = getConnection(settings);
-    if (!schemaExists(connection, tenant)) {
-      throw new TenantDoesNotExistsException("Tenant does not exist: " + tenant);
+    try (Connection connection = getConnection(settings)) {
+      if (!schemaExists(connection, tenant)) {
+        throw new TenantDoesNotExistsException("Tenant does not exist: " + tenant);
+      }
+      dropSchema(connection, getSchema(settings));
     }
-    dropSchema(connection, getSchema(settings));
-    connection.close();
   }
 
   public boolean schemaExists(String tenant) throws SQLException {
     Map<String, String> settings = getSettings(tenant);
-    Connection connection = getConnection(settings);
-    boolean exists = schemaExists(connection, getSchema(settings));
-    connection.close();
-    return exists;
+    try (Connection connection = getConnection(settings)) {
+      return schemaExists(connection, getSchema(settings));
+    }
   }
 
   private void initializeSchema(Connection connection, Map<String, String> settings) throws SQLException, IOException {
@@ -134,9 +133,9 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private void createSchema(Connection connection, String schema) throws SQLException {
-    Statement statement = connection.createStatement();
-    statement.executeUpdate(String.format("CREATE SCHEMA IF NOT EXISTS %s;", schema));
-    statement.close();
+    try (Statement statement = connection.createStatement()) {
+      statement.executeUpdate(String.format("CREATE SCHEMA IF NOT EXISTS %s;", schema));
+    }
   }
 
   private void createTables(Map<String, String> settings) {
@@ -146,43 +145,44 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private void initializeData(Connection connection, String schema) throws SQLException {
-    Statement statement = connection.createStatement();
-    statement.execute(sqlTemplateService.templateImportSql(schema));
-    statement.close();
+    try (Statement statement = connection.createStatement()) {
+      statement.execute(sqlTemplateService.templateImportSql(schema));
+    }
   }
 
   private void createAdditionalSchema(Connection connection, String schema) throws SQLException, IOException {
-    Statement statement = connection.createStatement();
-    statement.execute(sqlTemplateService.templateSelectSchemaSql(schema));
-    for (String path : tenantProperties.getSchemaScripts()) {
-      Resource resource = resourceLoader.getResource(path);
-      File script;
-      if (resource.getURI().getScheme().equals("jar")) {
-        script = File.createTempFile("schema", ".sql");
-        script.deleteOnExit();
-        IOUtils.copy(resource.getInputStream(), new FileOutputStream(script));
-      } else {
-        script = resource.getFile();
+    try (Statement statement = connection.createStatement()) {
+      statement.execute(sqlTemplateService.templateSelectSchemaSql(schema));
+      for (String path : tenantProperties.getSchemaScripts()) {
+        Resource resource = resourceLoader.getResource(path);
+        File script;
+        if (resource.getURI().getScheme().equals("jar")) {
+          script = File.createTempFile("schema", ".sql");
+          script.deleteOnExit();
+          IOUtils.copy(resource.getInputStream(), new FileOutputStream(script));
+        } else {
+          script = resource.getFile();
+        }
+        statement.execute(FileUtils.readFileToString(script, StandardCharsets.UTF_8));
       }
-      statement.execute(FileUtils.readFileToString(script, StandardCharsets.UTF_8));
     }
-    statement.close();
   }
 
   private void dropSchema(Connection connection, String schema) throws SQLException {
-    Statement statement = connection.createStatement();
-    statement.executeUpdate(String.format("DROP SCHEMA IF EXISTS %s CASCADE;", schema));
-    statement.close();
+    try (Statement statement = connection.createStatement()) {
+      statement.executeUpdate(String.format("DROP SCHEMA IF EXISTS %s CASCADE;", schema));
+    }
   }
 
   private boolean schemaExists(Connection connection, String schema) throws SQLException {
-    Statement statement = connection.createStatement();
-    String queryTemplate = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s');";
-    ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema));
-    resultSet.next();
-    boolean exists = resultSet.getBoolean(1);
-    statement.close();
-    return exists;
+    try (Statement statement = connection.createStatement()) {
+      String queryTemplate = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s');";
+      ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema));
+      if (resultSet.next()) {
+        return resultSet.getBoolean(1);
+      }
+      return false;
+    }
   }
 
   private Map<String, String> getSettings(String tenant) {
