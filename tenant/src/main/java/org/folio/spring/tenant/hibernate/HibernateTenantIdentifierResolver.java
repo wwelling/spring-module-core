@@ -2,6 +2,7 @@ package org.folio.spring.tenant.hibernate;
 
 import java.util.Optional;
 
+import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 
 import org.folio.spring.tenant.exception.NoTenantHeaderException;
@@ -21,6 +22,11 @@ public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifie
 
   @Autowired
   private Tenant tenantProperties;
+
+  @PreDestroy
+  public void unload() {
+    ThreadLocalStorage.unload();
+  }
 
   @Override
   public String resolveCurrentTenantIdentifier() {

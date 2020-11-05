@@ -12,4 +12,8 @@ public class ThreadLocalStorage {
     return tenant.get();
   }
 
+  public static void unload() {
+    tenant.remove();
+  }
+
 }
