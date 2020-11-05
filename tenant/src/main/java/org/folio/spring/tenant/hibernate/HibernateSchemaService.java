@@ -24,6 +24,7 @@ import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
 import org.folio.spring.tenant.properties.BuildInfo;
 import org.folio.spring.tenant.properties.Tenant;
 import org.folio.spring.tenant.service.SqlTemplateService;
+import org.folio.spring.tenant.utility.TenantUtility;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -74,7 +75,7 @@ public class HibernateSchemaService implements InitializingBean {
   private ResourceLoader resourceLoader;
 
   @Autowired(required = false)
-  private List<HibernateTenantInit> hibernateTenantInitializations = new ArrayList<HibernateTenantInit>();
+  private List<HibernateTenantInit> hibernateTenantInitializations = new ArrayList<>();
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -227,7 +228,7 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private String toSchema(String tenant) {
-    return String.format("%s_%s", tenant, buildInfoProperties.getArtifact()).replace("-", "_").toUpperCase();
+    return TenantUtility.getSchema(tenant, buildInfoProperties.getArtifact());
   }
 
 }
