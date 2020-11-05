@@ -9,6 +9,10 @@ import org.springframework.http.HttpStatus;
 
 public class ErrorUtility {
 
+  private ErrorUtility() {
+    // do nothing
+  }
+
   public static ResponseErrors buildError(Exception exception, HttpStatus status) {
     return buildError(exception.getLocalizedMessage(), exception.getClass().getSimpleName(), status.toString());
   }
@@ -24,10 +28,10 @@ public class ErrorUtility {
   }
 
   public static ResponseErrors buildErrors(List<Error> listOfErrors) {
-    ResponseErrors errors = new ResponseErrors();
-    errors.setErrors(listOfErrors);
-    errors.setTotalRecords(listOfErrors.size());
-    return errors;
+    ResponseErrors responseErrors = new ResponseErrors();
+    responseErrors.setErrors(listOfErrors);
+    responseErrors.setTotalRecords(listOfErrors.size());
+    return responseErrors;
   }
 
 }
