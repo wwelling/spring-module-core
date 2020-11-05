@@ -19,10 +19,12 @@ import javax.persistence.Entity;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.folio.spring.tenant.config.TenantConfig;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
 import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
+import org.folio.spring.tenant.properties.BuildInfo;
+import org.folio.spring.tenant.properties.Tenant;
 import org.folio.spring.tenant.service.SqlTemplateService;
+import org.folio.spring.tenant.utility.TenantUtility;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -51,11 +53,14 @@ public class HibernateSchemaService implements InitializingBean {
   private final static String HIBERNATE_CONNECTION_USERNAME = "hibernate.connection.username";
   private final static String HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
   private final static String HIBERNATE_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
-  
+
   private final List<String> domainPackages = new ArrayList<String>();
 
   @Autowired
-  private TenantConfig tenantConfig;
+  private Tenant tenantProperties;
+
+  @Autowired
+  private BuildInfo buildInfoProperties;
 
   @Autowired
   private SqlTemplateService sqlTemplateService;
@@ -70,16 +75,16 @@ public class HibernateSchemaService implements InitializingBean {
   private ResourceLoader resourceLoader;
 
   @Autowired(required = false)
-  private List<HibernateTenantInit> hibernateTenantInitializations = new ArrayList<HibernateTenantInit>();
+  private List<HibernateTenantInit> hibernateTenantInitializations = new ArrayList<>();
 
   @Override
   public void afterPropertiesSet() throws Exception {
     domainPackages.add("org.folio.rest.model");
-    for (String additionalDomainPackage : tenantConfig.getDomainPackages()) {
+    for (String additionalDomainPackage : tenantProperties.getDomainPackages()) {
       domainPackages.add(additionalDomainPackage);
     }
-    if (tenantConfig.isInitializeDefaultTenant()) {
-      String tenant = tenantConfig.getDefaultTenant();
+    if (tenantProperties.isInitializeDefaultTenant()) {
+      String tenant = tenantProperties.getDefaultTenant();
       Map<String, String> settings = getSettings(tenant);
       Connection connection = getConnection(settings);
       if (!schemaExists(connection, tenant)) {
@@ -105,14 +110,14 @@ public class HibernateSchemaService implements InitializingBean {
     if (!schemaExists(connection, tenant)) {
       throw new TenantDoesNotExistsException("Tenant does not exist: " + tenant);
     }
-    dropSchema(connection, tenant);
+    dropSchema(connection, getSchema(settings));
     connection.close();
   }
 
   public boolean schemaExists(String tenant) throws SQLException {
     Map<String, String> settings = getSettings(tenant);
     Connection connection = getConnection(settings);
-    boolean exists = schemaExists(connection, tenant);
+    boolean exists = schemaExists(connection, getSchema(settings));
     connection.close();
     return exists;
   }
@@ -130,7 +135,7 @@ public class HibernateSchemaService implements InitializingBean {
 
   private void createSchema(Connection connection, String schema) throws SQLException {
     Statement statement = connection.createStatement();
-    statement.executeUpdate(String.format("CREATE SCHEMA IF NOT EXISTS %s;", schema.toUpperCase()));
+    statement.executeUpdate(String.format("CREATE SCHEMA IF NOT EXISTS %s;", schema));
     statement.close();
   }
 
@@ -149,7 +154,7 @@ public class HibernateSchemaService implements InitializingBean {
   private void createAdditionalSchema(Connection connection, String schema) throws SQLException, IOException {
     Statement statement = connection.createStatement();
     statement.execute(sqlTemplateService.templateSelectSchemaSql(schema));
-    for (String path : tenantConfig.getSchemaScripts()) {
+    for (String path : tenantProperties.getSchemaScripts()) {
       Resource resource = resourceLoader.getResource(path);
       File script;
       if (resource.getURI().getScheme().equals("jar")) {
@@ -166,26 +171,26 @@ public class HibernateSchemaService implements InitializingBean {
 
   private void dropSchema(Connection connection, String schema) throws SQLException {
     Statement statement = connection.createStatement();
-    statement.executeUpdate(String.format("DROP SCHEMA IF EXISTS %s CASCADE;", schema.toUpperCase()));
+    statement.executeUpdate(String.format("DROP SCHEMA IF EXISTS %s CASCADE;", schema));
     statement.close();
   }
 
   private boolean schemaExists(Connection connection, String schema) throws SQLException {
     Statement statement = connection.createStatement();
     String queryTemplate = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s');";
-    ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema.toUpperCase()));
+    ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema));
     resultSet.next();
     boolean exists = resultSet.getBoolean(1);
     statement.close();
     return exists;
   }
 
-  private Map<String, String> getSettings(String schema) {
+  private Map<String, String> getSettings(String tenant) {
     Map<String, String> settings = new HashMap<String, String>();
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
-    settings.put(HIBERNATE_DEFAULT_SCHEMA, schema);
+    settings.put(HIBERNATE_DEFAULT_SCHEMA, toSchema(tenant));
     settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
     settings.put(HIBERNATE_CONNECTION_PASSWORD, dataSourceProperties.getPassword());
@@ -220,6 +225,10 @@ public class HibernateSchemaService implements InitializingBean {
       }
     }
     return sources;
+  }
+
+  private String toSchema(String tenant) {
+    return TenantUtility.getSchema(tenant, buildInfoProperties.getArtifact());
   }
 
 }
