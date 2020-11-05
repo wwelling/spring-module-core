@@ -41,6 +41,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
   }
 
   @Override
+  @SuppressWarnings("squid:S2095")
   public Connection getConnection(String tenant) throws SQLException {
     final Connection connection = getAnyConnection();
     try {
@@ -75,8 +76,9 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
       }
     } catch (SQLException e) {
       throw new HibernateException("Could not alter JDBC connection to use schema [" + toSchema(tenantProperties.getDefaultTenant()) + "]", e);
+    } finally {
+      connection.close();
     }
-    connection.close();
   }
 
   @Override

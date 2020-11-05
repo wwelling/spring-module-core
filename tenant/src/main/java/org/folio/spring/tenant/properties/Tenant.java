@@ -1,5 +1,6 @@
 package org.folio.spring.tenant.properties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "tenant")
-public class Tenant {
+public class Tenant implements Serializable {
+
+    private static final long serialVersionUID = -4623270335202728322L;
 
     private String headerName = "X-Okapi-Tenant";
 
@@ -18,13 +21,9 @@ public class Tenant {
 
     private boolean initializeDefaultTenant = false;
 
-    private List<String> domainPackages = new ArrayList<String>();
+    private List<String> domainPackages = new ArrayList<>();
 
-    private List<String> schemaScripts = new ArrayList<String>();
-
-    public Tenant() {
-
-    }
+    private List<String> schemaScripts = new ArrayList<>();
 
     public String getHeaderName() {
         return headerName;
@@ -59,11 +58,11 @@ public class Tenant {
     }
 
     public List<String> getDomainPackages() {
-      return domainPackages;
+        return domainPackages;
     }
-    
+
     public void setDomainPackages(List<String> domainPackages) {
-      this.domainPackages = domainPackages;
+        this.domainPackages = domainPackages;
     }
 
     public List<String> getSchemaScripts() {

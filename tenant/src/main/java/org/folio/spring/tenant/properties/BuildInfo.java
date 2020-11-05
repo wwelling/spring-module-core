@@ -1,11 +1,15 @@
 package org.folio.spring.tenant.properties;
 
+import java.io.Serializable;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "info.build")
-public class BuildInfo {
+public class BuildInfo implements Serializable {
+
+  private static final long serialVersionUID = -7137553746347037879L;
 
   private String artifact;
 
@@ -14,10 +18,6 @@ public class BuildInfo {
   private String description;
 
   private String version;
-
-  public BuildInfo() {
-
-  }
 
   public String getArtifact() {
     return artifact;
