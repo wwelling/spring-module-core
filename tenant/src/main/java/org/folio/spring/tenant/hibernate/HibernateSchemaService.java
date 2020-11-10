@@ -21,10 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
 import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
-import org.folio.spring.tenant.properties.BuildInfo;
 import org.folio.spring.tenant.properties.Tenant;
 import org.folio.spring.tenant.service.SqlTemplateService;
-import org.folio.spring.tenant.utility.TenantUtility;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -58,9 +56,6 @@ public class HibernateSchemaService implements InitializingBean {
 
   @Autowired
   private Tenant tenantProperties;
-
-  @Autowired
-  private BuildInfo buildInfoProperties;
 
   @Autowired
   private SqlTemplateService sqlTemplateService;
@@ -190,7 +185,7 @@ public class HibernateSchemaService implements InitializingBean {
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
-    settings.put(HIBERNATE_DEFAULT_SCHEMA, toSchema(tenant));
+    settings.put(HIBERNATE_DEFAULT_SCHEMA, tenant);
     settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
     settings.put(HIBERNATE_CONNECTION_PASSWORD, dataSourceProperties.getPassword());
@@ -225,10 +220,6 @@ public class HibernateSchemaService implements InitializingBean {
       }
     }
     return sources;
-  }
-
-  private String toSchema(String tenant) {
-    return TenantUtility.getSchema(tenant, buildInfoProperties.getArtifact());
   }
 
 }
