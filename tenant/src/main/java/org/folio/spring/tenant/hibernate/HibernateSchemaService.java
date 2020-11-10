@@ -22,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
 import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
 import org.folio.spring.tenant.properties.TenantProperties;
+import org.folio.spring.tenant.service.SchemaService;
 import org.folio.spring.tenant.service.SqlTemplateService;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -53,6 +54,9 @@ public class HibernateSchemaService implements InitializingBean {
   private final static String HIBERNATE_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
 
   private final List<String> domainPackages = new ArrayList<String>();
+
+  @Autowired
+  private SchemaService schemaService;
 
   @Autowired
   private TenantProperties tenantProperties;
@@ -185,7 +189,7 @@ public class HibernateSchemaService implements InitializingBean {
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
-    settings.put(HIBERNATE_DEFAULT_SCHEMA, tenant);
+    settings.put(HIBERNATE_DEFAULT_SCHEMA, schemaService.getSchema(tenant));
     settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
     settings.put(HIBERNATE_CONNECTION_PASSWORD, dataSourceProperties.getPassword());

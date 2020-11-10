@@ -7,6 +7,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.folio.spring.tenant.properties.TenantProperties;
+import org.folio.spring.tenant.service.SchemaService;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
 
   @Value("${spring.datasource.platform:h2}")
   private String platform;
+
+  @Autowired
+  private SchemaService schemaService;
 
   @Autowired
   private TenantProperties tenantProperties;
@@ -39,44 +43,45 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
 
   @Override
   public Connection getConnection(String tenant) throws SQLException {
+    String schema = tenant;
     final Connection connection = getAnyConnection();
     try {
       switch (platform) {
         case "h2":
           try (Statement statement = connection.createStatement()) {
-            statement.execute("USE " + tenant);
+            statement.execute("USE " + schema);
           }
           break;
         case "postgres":
-          connection.setSchema(tenant);
+          connection.setSchema(schema);
           break;
         default:
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException("Could not alter JDBC connection to use schema [" + tenant + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + schema + "]", e);
     }
     return connection;
   }
 
   @Override
   public void releaseConnection(String tenant, Connection connection) throws SQLException {
+    String defaultSchema = schemaService.getSchema(tenantProperties.getDefaultTenant());
     try {
       switch (platform) {
         case "h2":
           try (Statement statement = connection.createStatement()) {
-            statement.execute("USE " + tenantProperties.getDefaultTenant());
+            statement.execute("USE " + defaultSchema);
           }
           break;
         case "postgres":
-          connection.setSchema(tenantProperties.getDefaultTenant());
+          connection.setSchema(defaultSchema);
           break;
         default:
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException(
-          "Could not alter JDBC connection to use schema [" + tenantProperties.getDefaultTenant() + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + defaultSchema + "]", e);
     } finally {
       connection.close();
     }

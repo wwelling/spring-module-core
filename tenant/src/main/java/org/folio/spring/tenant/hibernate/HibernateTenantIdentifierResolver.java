@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.folio.spring.tenant.exception.NoTenantHeaderException;
 import org.folio.spring.tenant.properties.TenantProperties;
+import org.folio.spring.tenant.service.SchemaService;
 import org.folio.spring.tenant.storage.ThreadLocalStorage;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 @DependsOn("hibernateSchemaService")
 public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
+
+  @Autowired
+  private SchemaService schemaService;
 
   @Autowired
   private TenantProperties tenantProperties;
@@ -34,7 +38,7 @@ public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifie
     if (request.isPresent()) {
       String tenant = request.get().getHeader(tenantProperties.getHeaderName());
       if (tenant != null) {
-        return tenant;
+        return schemaService.getSchema(tenant);
       }
       if (tenantProperties.isForceTenant()) {
         throw new NoTenantHeaderException("No tenant header on request!");
@@ -42,11 +46,11 @@ public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifie
     } else {
       String tenant = ThreadLocalStorage.getTenant();
       if (tenant != null) {
-        return tenant;
+        return schemaService.getSchema(tenant);
       }
       // NOTE: not enforcing tenant here
     }
-    return tenantProperties.getDefaultTenant();
+    return schemaService.getSchema(tenantProperties.getDefaultTenant());
   }
 
   @Override
