@@ -6,7 +6,7 @@ import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 
 import org.folio.spring.tenant.exception.NoTenantHeaderException;
-import org.folio.spring.tenant.properties.Tenant;
+import org.folio.spring.tenant.properties.TenantProperties;
 import org.folio.spring.tenant.storage.ThreadLocalStorage;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
 
   @Autowired
-  private Tenant tenantProperties;
+  private TenantProperties tenantProperties;
 
   @PreDestroy
   public void unload() {

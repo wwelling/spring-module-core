@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.folio.spring.tenant.properties.Tenant;
+import org.folio.spring.tenant.properties.TenantProperties;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
   private String platform;
 
   @Autowired
-  private Tenant tenantProperties;
+  private TenantProperties tenantProperties;
 
   @Autowired
   private DataSource dataSource;

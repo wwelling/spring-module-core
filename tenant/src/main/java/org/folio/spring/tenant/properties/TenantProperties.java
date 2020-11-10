@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "tenant")
-public class Tenant implements Serializable {
+public class TenantProperties implements Serializable {
 
   private static final long serialVersionUID = -4623270335202728322L;
 

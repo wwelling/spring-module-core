@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "info.build")
-public class BuildInfo implements Serializable {
+public class BuildInfoProperties implements Serializable {
 
   private static final long serialVersionUID = -7137553746347037879L;
 
