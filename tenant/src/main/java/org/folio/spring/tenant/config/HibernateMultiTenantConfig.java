@@ -1,10 +1,10 @@
 package org.folio.spring.tenant.config;
 
 import static org.hibernate.MultiTenancyStrategy.SCHEMA;
-import static org.hibernate.cfg.AvailableSettings.C3P0_ACQUIRE_INCREMENT;
-import static org.hibernate.cfg.AvailableSettings.C3P0_MAX_SIZE;
-import static org.hibernate.cfg.AvailableSettings.C3P0_MIN_SIZE;
-import static org.hibernate.cfg.AvailableSettings.C3P0_TIMEOUT;
+// import static org.hibernate.cfg.AvailableSettings.C3P0_ACQUIRE_INCREMENT;
+// import static org.hibernate.cfg.AvailableSettings.C3P0_MAX_SIZE;
+// import static org.hibernate.cfg.AvailableSettings.C3P0_MIN_SIZE;
+// import static org.hibernate.cfg.AvailableSettings.C3P0_TIMEOUT;
 import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT;
 import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER;
 import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER;
@@ -47,10 +47,10 @@ public class HibernateMultiTenantConfig {
     properties.put(MULTI_TENANT, SCHEMA);
     properties.put(MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
     properties.put(MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
-    properties.put(C3P0_MIN_SIZE, 4);
-    properties.put(C3P0_MAX_SIZE, 16);
-    properties.put(C3P0_ACQUIRE_INCREMENT, 5);
-    properties.put(C3P0_TIMEOUT, 30000);
+    // properties.put(C3P0_MIN_SIZE, 4);
+    // properties.put(C3P0_MAX_SIZE, 16);
+    // properties.put(C3P0_ACQUIRE_INCREMENT, 5);
+    // properties.put(C3P0_TIMEOUT, 30000);
     LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
     em.setDataSource(dataSource);
     em.setPackagesToScan("org.folio.rest");
