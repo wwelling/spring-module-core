@@ -7,7 +7,7 @@ See the file ["LICENSE"](LICENSE) for more information.
 
 ## Introduction
 
-Spring module core libraries for Spring development with Okapi.
+Spring module core libraries for Spring development with FOLIO.
 
 ## Additional information
 
