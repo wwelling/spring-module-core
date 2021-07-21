@@ -1,6 +1,10 @@
 package org.folio.spring.service;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -9,11 +13,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import org.folio.spring.converter.ObjectPlainTextConverter;
 
 @Service
 public class HttpService {
@@ -35,9 +44,14 @@ public class HttpService {
   public void setup() {
     logger.info("Rest template connection timeout: {} seconds", connectionTimeout);
     logger.info("Rest template read timeout: {} seconds", readTimeout);
+
+    List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+    messageConverters.add(new ObjectPlainTextConverter(StandardCharsets.UTF_8));
+
     this.restTemplate = restTemplateBuilder
         .setConnectTimeout(Duration.ofSeconds(connectionTimeout))
         .setReadTimeout(Duration.ofSeconds(readTimeout))
+        .additionalMessageConverters(messageConverters)
         .build();
   }
 
