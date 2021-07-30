@@ -192,7 +192,7 @@ public class HibernateSchemaService implements InitializingBean {
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
-    settings.put(HIBERNATE_CONNECTION_DRIVER_CLASS, dataSourceProperties.getUrl());
+    settings.put(HIBERNATE_CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(HIBERNATE_DEFAULT_SCHEMA, schemaService.getSchema(tenant));
     settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
