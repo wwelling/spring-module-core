@@ -41,12 +41,15 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
 
+import static org.hibernate.cfg.AvailableSettings.*;
+
 @Service("hibernateSchemaService")
 public class HibernateSchemaService implements InitializingBean {
 
   private final static String CONNECTION_DRIVER_CLASS = "connection.driver_class";
   private final static String DIALECT = "dialect";
   private final static String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
+  private final static String HIBERNATE_CONNECTION_DRIVER_CLASS = "hibernate.connection.driver_class";
   private final static String HIBERNATE_DEFAULT_SCHEMA = "hibernate.default_schema";
   private final static String HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION = "hibernate.jdbc.lob.non_contextual_creation";
   private final static String HIBERNATE_CONNECTION_USERNAME = "hibernate.connection.username";
@@ -189,6 +192,7 @@ public class HibernateSchemaService implements InitializingBean {
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
+    settings.put(HIBERNATE_CONNECTION_DRIVER_CLASS, dataSourceProperties.getUrl());
     settings.put(HIBERNATE_DEFAULT_SCHEMA, schemaService.getSchema(tenant));
     settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
