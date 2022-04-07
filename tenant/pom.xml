@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.folio</groupId>
     <artifactId>spring-module-core</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1-RC1</version>
   </parent>
 
   <dependencies>
@@ -21,13 +21,13 @@
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>spring-domain</artifactId>
-      <version>1.1.1-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>spring-web</artifactId>
-      <version>1.1.1-SNAPSHOT</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
@@ -38,7 +38,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
     </dependency>
 
     <dependency>
