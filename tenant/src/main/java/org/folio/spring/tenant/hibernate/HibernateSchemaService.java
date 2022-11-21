@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -40,8 +41,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
-
-import static org.hibernate.cfg.AvailableSettings.*;
 
 @Service("hibernateSchemaService")
 public class HibernateSchemaService implements InitializingBean {
@@ -177,9 +176,10 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private boolean schemaExists(Connection connection, String schema) throws SQLException {
-    try (Statement statement = connection.createStatement()) {
-      String queryTemplate = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s');";
-      ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema));
+    String sql = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = ?)";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, schema);
+      ResultSet resultSet = statement.executeQuery();
       if (resultSet.next()) {
         return resultSet.getBoolean(1);
       }
