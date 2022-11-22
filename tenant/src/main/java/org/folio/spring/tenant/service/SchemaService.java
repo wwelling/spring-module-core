@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SchemaService {
 
-  private static final Pattern SCHEMA_REGEXP = Pattern.compile("[a-zA-Z0-9_]+");
+  // allowing only a-z A-Z 0-9 and _ prevents SQL injection
+  private static final Pattern SCHEMA_REGEXP = Pattern.compile("\\w+");
 
   @Autowired
   private BuildInfoProperties buildInfoProperties;
