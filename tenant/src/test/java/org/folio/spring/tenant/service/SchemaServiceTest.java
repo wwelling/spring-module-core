@@ -15,7 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = SchemaService.class)
 @EnableConfigurationProperties(value = BuildInfoProperties.class)
-@TestPropertySource(properties = "info.build.artifact=mod-foo")
+@TestPropertySource(properties = "info.build.artifact=mod-Baz")
 class SchemaServiceTest {
 
   @Autowired
@@ -23,7 +23,7 @@ class SchemaServiceTest {
 
   @Test
   void validSchema() {
-    assertThat(schemaService.getSchema("tenant123"), is("tenant123_mod_foo"));
+    assertThat(schemaService.getSchema("FooBar123"), is("foobar123_mod_baz"));
   }
 
   @ParameterizedTest

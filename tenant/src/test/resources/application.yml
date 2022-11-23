@@ -1,0 +1,53 @@
+info.build.artifact: mod-example
+
+logging:
+  file: logs/mod-workflow-tests.log
+  level:
+    org:
+      folio: INFO
+      hibernate: INFO
+      springframework: INFO
+  path:
+
+server:
+  port: 9101
+
+spring:
+  application.name: mod-example
+  data.rest:
+    returnBodyOnCreate: true
+    returnBodyOnUpdate: true
+  datasource:
+    platform: h2
+    url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;DATABASE_TO_LOWER=true;DEFAULT_NULL_ORDERING=HIGH
+    driverClassName: org.h2.Driver
+    username: folio
+    password: folio
+  h2:
+    console:
+      enabled: true
+      path: /h2console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    properties.hibernate.jdbc.lob.non_contextual_creation: true
+    generate-ddl: false
+    hibernate.ddl-auto: none
+    open-in-view: true
+    show-sql: false
+  profiles:
+    active: default
+  thymeleaf:
+    mode: TEXT
+    suffix: .sql
+
+event.queue.name: event.queue
+
+tenant:
+  header-name: X-Okapi-Tenant
+  force-tenant: false
+  default-tenant: diku
+  initialize-default-tenant: true
+  domain-packages:
+  schema-scripts:
+
+okapi.url: http://localhost:9130
