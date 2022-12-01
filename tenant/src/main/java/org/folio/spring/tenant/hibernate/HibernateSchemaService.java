@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -40,8 +41,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Service;
-
-import static org.hibernate.cfg.AvailableSettings.*;
 
 @Service("hibernateSchemaService")
 public class HibernateSchemaService implements InitializingBean {
@@ -89,7 +88,7 @@ public class HibernateSchemaService implements InitializingBean {
       String tenant = tenantProperties.getDefaultTenant();
       Map<String, String> settings = getSettings(tenant);
       try (Connection connection = getConnection(settings)) {
-        if (!schemaExists(connection, tenant)) {
+        if (!schemaExists(connection, settings)) {
           initializeSchema(connection, settings);
         }
       }
@@ -99,7 +98,7 @@ public class HibernateSchemaService implements InitializingBean {
   public void createTenant(String tenant) throws SQLException, IOException {
     Map<String, String> settings = getSettings(tenant);
     try (Connection connection = getConnection(settings)) {
-      if (schemaExists(connection, tenant)) {
+      if (schemaExists(connection, settings)) {
         throw new TenantAlreadyExistsException("Tenant already exists: " + tenant);
       }
       initializeSchema(connection, settings);
@@ -109,7 +108,7 @@ public class HibernateSchemaService implements InitializingBean {
   public void deleteTenant(String tenant) throws SQLException {
     Map<String, String> settings = getSettings(tenant);
     try (Connection connection = getConnection(settings)) {
-      if (!schemaExists(connection, tenant)) {
+      if (!schemaExists(connection, settings)) {
         throw new TenantDoesNotExistsException("Tenant does not exist: " + tenant);
       }
       dropSchema(connection, getSchema(settings));
@@ -119,7 +118,7 @@ public class HibernateSchemaService implements InitializingBean {
   public boolean schemaExists(String tenant) throws SQLException {
     Map<String, String> settings = getSettings(tenant);
     try (Connection connection = getConnection(settings)) {
-      return schemaExists(connection, getSchema(settings));
+      return schemaExists(connection, settings);
     }
   }
 
@@ -176,10 +175,11 @@ public class HibernateSchemaService implements InitializingBean {
     }
   }
 
-  private boolean schemaExists(Connection connection, String schema) throws SQLException {
-    try (Statement statement = connection.createStatement()) {
-      String queryTemplate = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s');";
-      ResultSet resultSet = statement.executeQuery(String.format(queryTemplate, schema));
+  private boolean schemaExists(Connection connection, Map<String, String> settings) throws SQLException {
+    String sql = "SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = ?)";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setString(1, getSchema(settings));
+      ResultSet resultSet = statement.executeQuery();
       if (resultSet.next()) {
         return resultSet.getBoolean(1);
       }
