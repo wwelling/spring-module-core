@@ -1,7 +1,5 @@
 package org.folio.spring.tenant.config;
 
-import static org.hibernate.MultiTenancyStrategy.SCHEMA;
-import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT;
 import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER;
 import static org.hibernate.cfg.AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER;
 
@@ -40,7 +38,6 @@ public class HibernateMultiTenantConfig {
   // @formatter:on
     Map<String, Object> properties = new HashMap<>();
     properties.putAll(jpaProperties.getProperties());
-    properties.put(MULTI_TENANT, SCHEMA);
     properties.put(MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
     properties.put(MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
     LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
