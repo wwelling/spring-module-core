@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.folio.spring.controller.exception.SchemaIOException;
 import org.folio.spring.controller.exception.SchemaNotFoundException;

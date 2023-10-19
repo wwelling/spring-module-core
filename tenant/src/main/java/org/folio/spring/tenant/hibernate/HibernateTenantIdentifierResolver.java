@@ -2,8 +2,8 @@ package org.folio.spring.tenant.hibernate;
 
 import java.util.Optional;
 
-import javax.annotation.PreDestroy;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.PreDestroy;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.folio.spring.tenant.exception.NoTenantHeaderException;
 import org.folio.spring.tenant.properties.TenantProperties;

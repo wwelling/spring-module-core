@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -214,7 +214,8 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private MetadataImplementor buildMetadata(Map<String, String> settings) {
-    StandardServiceRegistry registry = new StandardServiceRegistryBuilder().applySettings(settings).build();
+    Map<String, Object> settings2 = Map.copyOf(settings);
+    StandardServiceRegistry registry = new StandardServiceRegistryBuilder().applySettings(settings2).build();
     MetadataSources sources = addEntities(new MetadataSources(registry));
     return (MetadataImplementor) sources.getMetadataBuilder().build();
   }

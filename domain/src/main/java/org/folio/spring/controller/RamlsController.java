@@ -3,7 +3,7 @@ package org.folio.spring.controller;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.folio.spring.controller.exception.SchemaIOException;
 import org.folio.spring.service.RamlsService;
