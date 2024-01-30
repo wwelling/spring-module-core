@@ -32,8 +32,8 @@ public class HibernateMultiTenantConfig {
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(
     DataSource dataSource,
     JpaProperties jpaProperties,
-    MultiTenantConnectionProvider multiTenantConnectionProvider,
-    CurrentTenantIdentifierResolver currentTenantIdentifierResolver
+    MultiTenantConnectionProvider<?> multiTenantConnectionProvider,
+    CurrentTenantIdentifierResolver<?> currentTenantIdentifierResolver
   ) {
   // @formatter:on
     Map<String, Object> properties = new HashMap<>();
