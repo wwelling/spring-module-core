@@ -19,7 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 @DependsOn("hibernateSchemaService")
-public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
+public class HibernateTenantIdentifierResolver implements CurrentTenantIdentifierResolver<String> {
 
   @Autowired
   private SchemaService schemaService;

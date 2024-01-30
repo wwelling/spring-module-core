@@ -3,6 +3,13 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.2</version>
+    <relativePath /> <!-- lookup parent from repository -->
+  </parent>
+
   <groupId>org.folio</groupId>
   <artifactId>spring-module-core</artifactId>
   <version>2.1.0-SNAPSHOT</version>
@@ -19,6 +26,7 @@
 
   <modules>
     <module>domain</module>
+    <module>messaging</module>
     <module>tenant</module>
     <module>web</module>
   </modules>
@@ -27,7 +35,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spring-boot.version>3.1.5</spring-boot.version>
+    <spring-module-core.version>2.1.0-SNAPSHOT</spring-module-core.version>
+    <springdoc.version>2.3.0</springdoc.version>
+    <activemq.version>6.0.1</activemq.version>
   </properties>
 
   <dependencyManagement>
@@ -37,14 +47,6 @@
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
         <version>2.2</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
 
       <dependency>
@@ -73,9 +75,13 @@
       <plugins>
 
         <plugin>
+          <groupId>org.graalvm.buildtools</groupId>
+          <artifactId>native-maven-plugin</artifactId>
+        </plugin>
+
+        <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
-          <version>${spring-boot.version}</version>
         </plugin>
 
         <plugin>
@@ -126,7 +132,25 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.5</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.3.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.hibernate.orm.tooling</groupId>
+          <artifactId>hibernate-enhance-maven-plugin</artifactId>
+          <version>${hibernate.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.springdoc</groupId>
+          <artifactId>springdoc-openapi-maven-plugin</artifactId>
+          <version>1.4</version>
         </plugin>
 
       </plugins>
