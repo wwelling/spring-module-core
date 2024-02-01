@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.folio.spring.converter;
+package org.folio.spring.web.converter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

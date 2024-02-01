@@ -1,4 +1,4 @@
-package org.folio.spring.controller.exception;
+package org.folio.spring.domain.controller.exception;
 
 public class SchemaIOException extends RuntimeException {
 

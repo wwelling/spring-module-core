@@ -1,7 +1,7 @@
 package org.folio.spring.tenant.resolver;
 
 import org.folio.spring.tenant.annotation.TenantHeader;
-import org.folio.spring.utility.AnnotationUtility;
+import org.folio.spring.web.utility.AnnotationUtility;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;

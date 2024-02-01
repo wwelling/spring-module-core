@@ -1,10 +1,9 @@
-package org.folio.spring.utility;
+package org.folio.spring.web.utility;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.folio.spring.model.response.Error;
-import org.folio.spring.model.response.ResponseErrors;
+import org.folio.spring.web.model.response.Error;
+import org.folio.spring.web.model.response.ResponseErrors;
 import org.springframework.http.HttpStatus;
 
 public class ErrorUtility {

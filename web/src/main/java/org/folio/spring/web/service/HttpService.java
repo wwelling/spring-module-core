@@ -1,4 +1,4 @@
-package org.folio.spring.service;
+package org.folio.spring.web.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
-
+import org.folio.spring.web.converter.ObjectPlainTextConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import org.folio.spring.converter.ObjectPlainTextConverter;
 
 @Service
 public class HttpService {

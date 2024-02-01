@@ -1,4 +1,4 @@
-package org.folio.spring.utility;
+package org.folio.spring.web.utility;
 
 import java.lang.annotation.Annotation;
 

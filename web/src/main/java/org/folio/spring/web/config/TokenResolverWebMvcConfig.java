@@ -1,8 +1,7 @@
-package org.folio.spring.config;
+package org.folio.spring.web.config;
 
 import java.util.List;
-
-import org.folio.spring.resolver.TokenHeaderResolver;
+import org.folio.spring.web.resolver.TokenHeaderResolver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

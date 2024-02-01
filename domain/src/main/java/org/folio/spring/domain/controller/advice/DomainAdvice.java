@@ -1,7 +1,7 @@
-package org.folio.spring.controller.advice;
+package org.folio.spring.domain.controller.advice;
 
-import org.folio.spring.model.response.ResponseErrors;
-import org.folio.spring.utility.ErrorUtility;
+import org.folio.spring.web.model.response.ResponseErrors;
+import org.folio.spring.web.utility.ErrorUtility;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.folio.rest.workflow.jms.model;
+package org.folio.spring.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.folio.rest.workflow.jms.config;
+package org.folio.spring.config;
 
 import jakarta.jms.ConnectionFactory;
 

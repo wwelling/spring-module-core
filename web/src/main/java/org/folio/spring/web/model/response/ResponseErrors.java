@@ -1,4 +1,4 @@
-package org.folio.spring.model.response;
+package org.folio.spring.web.model.response;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,10 +1,9 @@
-package org.folio.spring.controller;
+package org.folio.spring.domain.controller;
 
 import java.io.IOException;
 import java.util.Optional;
-
-import org.folio.spring.controller.exception.SchemaIOException;
-import org.folio.spring.service.JsonSchemasService;
+import org.folio.spring.domain.controller.exception.SchemaIOException;
+import org.folio.spring.domain.service.JsonSchemasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

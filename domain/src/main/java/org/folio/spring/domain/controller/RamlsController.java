@@ -1,12 +1,10 @@
-package org.folio.spring.controller;
-
-import java.io.IOException;
-import java.util.Optional;
+package org.folio.spring.domain.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.folio.spring.controller.exception.SchemaIOException;
-import org.folio.spring.service.RamlsService;
+import java.io.IOException;
+import java.util.Optional;
+import org.folio.spring.domain.controller.exception.SchemaIOException;
+import org.folio.spring.domain.service.RamlsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
