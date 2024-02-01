@@ -43,23 +43,22 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
 
   @Override
   public Connection getConnection(String tenant) throws SQLException {
-    String schema = (String) tenant;
     final Connection connection = getAnyConnection();
     try {
       switch (platform) {
         case "h2":
           try (Statement statement = connection.createStatement()) {
-            statement.execute("USE " + schema);
+            statement.execute("USE " + tenant);
           }
           break;
         case "postgres":
-          connection.setSchema(schema);
+          connection.setSchema(tenant);
           break;
         default:
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException("Could not alter JDBC connection to use schema [" + schema + "] on platform [" + platform + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + tenant + "] on platform [" + platform + "]", e);
     }
     return connection;
   }
