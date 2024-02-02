@@ -19,7 +19,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
 
   private static final long serialVersionUID = 5748544845255283079L;
 
-  @Value("${spring.datasource.platform:h2}")
+  @Value("${spring.sql.init.platform:h2}")
   private String platform;
 
   @Autowired
