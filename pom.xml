@@ -128,12 +128,6 @@
           <version>1.4</version>
         </plugin>
 
-        <plugin>
-          <groupId>com.github.victools</groupId>
-          <artifactId>jsonschema-maven-plugin</artifactId>
-          <version>4.31.1</version>
-        </plugin>
-
       </plugins>
     </pluginManagement>
 
