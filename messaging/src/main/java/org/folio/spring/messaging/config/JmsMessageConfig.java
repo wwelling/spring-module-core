@@ -1,4 +1,4 @@
-package org.folio.spring.config;
+package org.folio.spring.messaging.config;
 
 import jakarta.jms.ConnectionFactory;
 

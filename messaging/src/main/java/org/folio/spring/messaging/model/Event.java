@@ -1,4 +1,4 @@
-package org.folio.spring.model;
+package org.folio.spring.messaging.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
