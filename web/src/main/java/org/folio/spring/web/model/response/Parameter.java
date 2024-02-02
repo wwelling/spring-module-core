@@ -24,7 +24,7 @@ public class Parameter {
 
   @JsonIgnore
   @Valid
-  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonProperty("key")
   public String getKey() {

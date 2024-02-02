@@ -43,7 +43,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
 
   @Override
   public Connection getConnection(String tenant) throws SQLException {
-    String schema = (String) tenant;
+    String schema = tenant;
     final Connection connection = getAnyConnection();
     try {
       switch (platform) {

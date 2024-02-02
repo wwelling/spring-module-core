@@ -50,10 +50,10 @@ public class Event implements Serializable {
     this.tenant = tenant;
     this.path = path;
     this.method = method;
-    this.headers = new HashMap<String, String>();
+    this.headers = new HashMap<>();
     this.payload = JsonNodeFactory.instance.objectNode();
-    this.processDefinitionIds = new ArrayList<String>();
-    this.taskIds = new ArrayList<String>();
+    this.processDefinitionIds = new ArrayList<>();
+    this.taskIds = new ArrayList<>();
   }
 
   // @formatter:off

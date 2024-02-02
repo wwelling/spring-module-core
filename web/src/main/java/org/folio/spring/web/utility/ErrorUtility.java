@@ -21,7 +21,7 @@ public class ErrorUtility {
     error.setMessage(message);
     error.setType(type);
     error.setCode(code);
-    List<Error> listOfErrors = new ArrayList<Error>();
+    List<Error> listOfErrors = new ArrayList<>();
     listOfErrors.add(error);
     return buildErrors(listOfErrors);
   }

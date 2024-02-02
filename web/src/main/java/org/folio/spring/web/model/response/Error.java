@@ -31,11 +31,11 @@ public class Error {
 
   @JsonProperty("parameters")
   @Valid
-  private List<Parameter> parameters = new ArrayList<Parameter>();
+  private List<Parameter> parameters = new ArrayList<>();
 
   @JsonIgnore
   @Valid
-  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonProperty("message")
   public String getMessage() {

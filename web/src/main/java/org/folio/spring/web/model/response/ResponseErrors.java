@@ -20,14 +20,14 @@ public class ResponseErrors {
 
   @JsonProperty("errors")
   @Valid
-  private List<Error> errors = new ArrayList<Error>();
+  private List<Error> errors = new ArrayList<>();
 
   @JsonProperty("total_records")
   private Integer totalRecords;
 
   @JsonIgnore
   @Valid
-  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+  private Map<String, Object> additionalProperties = new HashMap<>();
 
   @JsonProperty("errors")
   public List<Error> getErrors() {

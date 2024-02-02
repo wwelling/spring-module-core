@@ -19,8 +19,9 @@ import org.springframework.jms.support.converter.MessageType;
 public class JmsMessageConfig {
 
   @Bean
+  @SuppressWarnings("rawtypes")
   // @formatter:off
-  public JmsListenerContainerFactory<?> myFactory(
+  public JmsListenerContainerFactory myFactory(
     ConnectionFactory connectionFactory,
     DefaultJmsListenerContainerFactoryConfigurer configurer
   ) {
