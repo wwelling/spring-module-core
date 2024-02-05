@@ -21,8 +21,12 @@ public class RamlsController {
   private static final String APPLICATION_RAML_YAML = "application/raml+yaml";
   private static final String APPLICATION_JSON = "application/json";
 
+  private final RamlsService ramlsService;
+
   @Autowired
-  private RamlsService ramlsService;
+  public RamlsController(RamlsService ramlsService) {
+      this.ramlsService = ramlsService;
+  }
 
   @GetMapping
   public ResponseEntity<Object> getRamls(

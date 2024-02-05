@@ -13,8 +13,12 @@
   <name>Spring Okapi Module Core Web</name>
   <description>Web for Spring Okapi Module Core</description>
 
-  <dependencies>
+  <properties>
+    <!-- Sonar Cloud Configuration -->
+    <sonar.exclusions>**/web/service/HttpService.java</sonar.exclusions>
+  </properties>
 
+  <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>

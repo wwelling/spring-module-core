@@ -54,7 +54,7 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
 
 
   @Nullable
-  private volatile List<Charset> availableCharsets;
+  private List<Charset> availableCharsets;
 
   private boolean writeAcceptCharset = false;
 

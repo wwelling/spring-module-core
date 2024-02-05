@@ -21,11 +21,15 @@ public class JsonSchemasService {
   private static final String RAMLS_PATH = "ramls/";
   private static final String HASH_TAG = "#";
 
-  @Autowired
-  private ResourcePatternResolver resolver;
+  private final ResourcePatternResolver resolver;
+
+  private final ObjectMapper mapper;
 
   @Autowired
-  private ObjectMapper mapper;
+  public JsonSchemasService(ResourcePatternResolver resolver, ObjectMapper mapper) {
+      this.resolver = resolver;
+      this.mapper = mapper;
+  }
 
   public List<String> getSchemas() throws IOException {
     List<String> schemas = new ArrayList<>();

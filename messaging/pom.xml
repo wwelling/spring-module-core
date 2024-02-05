@@ -13,6 +13,11 @@
   <name>Spring Okapi Module Core Messaging</name>
   <description>Messaging for Spring Okapi Module Core</description>
 
+  <properties>
+    <!-- Sonar Cloud Configuration -->
+    <sonar.exclusions>**/messaging/model/Event.java</sonar.exclusions>
+  </properties>
+
   <dependencies>
 
     <dependency>

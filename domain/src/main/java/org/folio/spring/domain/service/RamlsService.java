@@ -21,8 +21,12 @@ public class RamlsService {
   private static final String RAMLS_PATH = "ramls/";
   private static final String RAML_EXT = ".raml";
 
+  private final ResourcePatternResolver resolver;
+
   @Autowired
-  private ResourcePatternResolver resolver;
+  public RamlsService(ResourcePatternResolver resolver) {
+      this.resolver = resolver;
+  }
 
   public List<String> getRamls() throws IOException {
     List<String> ramls = new ArrayList<>();

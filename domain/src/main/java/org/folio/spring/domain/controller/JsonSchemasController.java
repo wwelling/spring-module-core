@@ -20,8 +20,12 @@ public class JsonSchemasController {
   private static final String APPLICATION_SCHEMA_JSON = "application/schema+json";
   private static final String APPLICATION_JSON = "application/json";
 
+  private final JsonSchemasService jsonSchemasService;
+
   @Autowired
-  private JsonSchemasService jsonSchemasService;
+  public JsonSchemasController(JsonSchemasService jsonSchemasService) {
+      this.jsonSchemasService = jsonSchemasService;
+  }
 
   @GetMapping
   public ResponseEntity<Object> getSchemas(
