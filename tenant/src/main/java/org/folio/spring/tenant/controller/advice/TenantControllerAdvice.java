@@ -2,11 +2,10 @@ package org.folio.spring.tenant.controller.advice;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
-import org.folio.spring.model.response.ResponseErrors;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
 import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
-import org.folio.spring.utility.ErrorUtility;
+import org.folio.spring.web.model.response.ResponseErrors;
+import org.folio.spring.web.utility.ErrorUtility;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
