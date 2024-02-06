@@ -1,11 +1,11 @@
-package org.folio.spring.tenant;
+package org.folio.spring.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-@SpringBootApplication(scanBasePackages = "org.folio.spring.tenant")
+@SpringBootApplication(scanBasePackages = "org.folio.spring.web")
 public class TestApplication extends SpringBootServletInitializer {
 
   @Override
