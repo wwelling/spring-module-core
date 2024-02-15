@@ -182,6 +182,10 @@ class RamlsControllerTest {
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideHeadersBodyStatusForGet() throws NoSuchMethodException, SecurityException {
+    HttpHeaders okapiHeadersWithPath = new HttpHeaders();
+    okapiHeadersWithPath.addAll(OKAPI_HEADERS);
+    okapiHeadersWithPath.add("path", "/path");
+
     return Stream.of(
       Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 200),
       Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 200),
@@ -192,6 +196,16 @@ class RamlsControllerTest {
       Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 200),
       Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 200),
       Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 200),
+
+      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 200),
+      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 200),
+      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 200),
+      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 200),
+      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 200),
+      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 200),
+      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 200),
+      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 200),
+      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 200),
 
       Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 400),
       Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 400),
