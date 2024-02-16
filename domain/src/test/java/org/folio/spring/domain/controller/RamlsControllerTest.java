@@ -1,19 +1,34 @@
 package org.folio.spring.domain.controller;
 
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.APPLICATION_JSON;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.APPLICATION_STREAM;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.JSON_ARRAY;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.JSON_OBJECT;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.NO_HEADERS;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.OKAPI_HEADERS;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.OKAPI_HEADERS_NO_URL;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.PLAIN_BODY;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.SUCCESS;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.TEXT_PLAIN;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.appendBody;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.appendHeaders;
-import static org.folio.spring.domain.utility.mock.MockMvcRequest.invokeRequestBuilder;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_JSON;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_RAML;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_STAR;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_STREAM;
+import static org.folio.spring.test.mock.MockMvcConstant.JSON_ARRAY;
+import static org.folio.spring.test.mock.MockMvcConstant.JSON_OBJECT;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_JSON;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_RAML;
+import static org.folio.spring.test.mock.MockMvcConstant.NO_HEAD;
+import static org.folio.spring.test.mock.MockMvcConstant.NO_PARAM;
+import static org.folio.spring.test.mock.MockMvcConstant.NULL_STR;
+import static org.folio.spring.test.mock.MockMvcConstant.OKAPI_HEAD;
+import static org.folio.spring.test.mock.MockMvcConstant.OKAPI_HEAD_NO_URL;
+import static org.folio.spring.test.mock.MockMvcConstant.PATH_PARAM;
+import static org.folio.spring.test.mock.MockMvcConstant.PLAIN_BODY;
+import static org.folio.spring.test.mock.MockMvcConstant.STAR;
+import static org.folio.spring.test.mock.MockMvcConstant.TEXT_PLAIN;
+import static org.folio.spring.test.mock.MockMvcReflection.DELETE;
+import static org.folio.spring.test.mock.MockMvcReflection.PATCH;
+import static org.folio.spring.test.mock.MockMvcReflection.POST;
+import static org.folio.spring.test.mock.MockMvcReflection.PUT;
+import static org.folio.spring.test.mock.MockMvcRequest.appendBody;
+import static org.folio.spring.test.mock.MockMvcRequest.appendHeaders;
+import static org.folio.spring.test.mock.MockMvcRequest.appendParameters;
+import static org.folio.spring.test.mock.MockMvcRequest.buildArguments1;
+import static org.folio.spring.test.mock.MockMvcRequest.buildArguments2;
+import static org.folio.spring.test.mock.MockMvcRequest.invokeRequestBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,7 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.stream.Stream;
 import org.folio.spring.domain.service.RamlsService;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,10 +48,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.MultiValueMap;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,121 +69,63 @@ class RamlsControllerTest {
 
   @ParameterizedTest
   @MethodSource("provideHeadersBodyStatusForGet")
-  void getWorksTest(HttpHeaders headers, String contentType, String accept, String body, int status) throws Exception {
-    lenient().when(ramlsService.getRamlByPath(anyString(), anyString())).thenReturn(SUCCESS);
+  void getWorksTest(HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
+    lenient().when(ramlsService.getRamlByPath(anyString(), anyString())).thenReturn(JSON_ARRAY);
 
     MockHttpServletRequestBuilder request = appendHeaders(get(RAMLS_PATH), headers, contentType, accept);
+    request = appendParameters(request, parameters);
 
     MvcResult result = mvc.perform(appendBody(request, body))
       .andDo(print()).andExpect(status().is(status)).andReturn();
 
     if (status == 200) {
-      String contentTypeOnly = result.getResponse().getContentType().replaceAll(";.*$", "");
+      MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
 
-      // @fixme "application/json" is always returned even if Accept is asking for something different. Is this inteded behavior?
-      assertEquals(APPLICATION_JSON, contentTypeOnly);
+      assertTrue(mediaType.isCompatibleWith(responseType));
       assertEquals(JSON_ARRAY, result.getResponse().getContentAsString());
     }
   }
 
   @ParameterizedTest
   @MethodSource("provideDeletePatchPostPut")
-  void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, String body, int status) throws Exception {
-    mvc.perform(invokeRequestBuilder(RAMLS_PATH, method, headers, contentType, accept, body))
+  void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
+    mvc.perform(invokeRequestBuilder(RAMLS_PATH, method, headers, contentType, accept, parameters, body))
       .andDo(print()).andExpect(status().is(status));
   }
 
   /**
    * Helper function for parameterized test providing DELETE, PATCH, POST, and PUT.
    *
-   * @return The arguments array.
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - Method The (reflection) request method.
+   *     - HttpHeaders headers.
+   *     - String contentType (Content-Type request).
+   *     - String accept (ask for this Content-Type on response).
+   *       String mediaType (response Content-Type).
+   *     - MultiValueMap<String, String> parameters.
+   *     - String body (request body).
+   *     - int status (response HTTP status code).
    *
    * @throws SecurityException
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideDeletePatchPostPut() throws NoSuchMethodException, SecurityException {
-    Method delete = MockMvcRequestBuilders.class.getDeclaredMethod("delete", URI.class);
-    Method patch = MockMvcRequestBuilders.class.getDeclaredMethod("patch", URI.class);
-    Method post = MockMvcRequestBuilders.class.getDeclaredMethod("post", URI.class);
-    Method put = MockMvcRequestBuilders.class.getDeclaredMethod("put", URI.class);
+    String[] contentTypes = { APP_JSON, TEXT_PLAIN, APP_STREAM };
+    String[] bodys = { JSON_OBJECT, PLAIN_BODY, JSON_OBJECT };
+    String[] accepts = { APP_RAML, APP_JSON, TEXT_PLAIN, APP_STREAM, NULL_STR, APP_STAR, STAR };
+    MediaType[] mediaTypes = { MT_APP_JSON, MT_APP_RAML };
+    Object[] params = { NO_PARAM, PATH_PARAM };
 
-    return Stream.of(
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(delete, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(delete, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(delete, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(delete, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(delete, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(delete, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(delete, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
+    Stream<Arguments> stream1 = buildArguments2(DELETE, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    Stream<Arguments> stream2 = buildArguments2(PATCH, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    Stream<Arguments> stream = Stream.concat(stream1, stream2);
 
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
+    stream1 = buildArguments2(POST, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    stream2 = Stream.concat(stream, stream1);
 
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(post, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(post, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(post, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(post, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(post, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(post, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(post, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405)
-    );
+    stream1 = buildArguments2(PUT, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    return Stream.concat(stream2, stream1);
   }
 
   /**
@@ -176,57 +133,77 @@ class RamlsControllerTest {
    *
    * This is intended to be used for when the correct HTTP method is being used in the request.
    *
-   * @return The arguments array.
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - HttpHeaders headers.
+   *     - String contentType (Content-Type request).
+   *     - String accept (ask for this Content-Type on response).
+   *       String mediaType (response Content-Type).
+   *     - MultiValueMap<String, String> parameters.
+   *     - String body (request body).
+   *     - int status (response HTTP status code).
    *
    * @throws SecurityException
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideHeadersBodyStatusForGet() throws NoSuchMethodException, SecurityException {
-    HttpHeaders okapiHeadersWithPath = new HttpHeaders();
-    okapiHeadersWithPath.addAll(OKAPI_HEADERS);
-    okapiHeadersWithPath.add("path", "/path");
+    Stream<Arguments> stream1 = Stream.of(
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_RAML,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_JSON,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   TEXT_PLAIN, MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_STREAM, MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   NULL_STR,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_STAR,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   STAR,       MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_RAML,   MT_APP_JSON, NO_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_JSON,   MT_APP_JSON, NO_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, TEXT_PLAIN, MT_APP_JSON, NO_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_STREAM, MT_APP_JSON, NO_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, NULL_STR,   MT_APP_JSON, NO_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, STAR,       MT_APP_JSON, NO_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_STAR,   MT_APP_JSON, NO_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_RAML,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_JSON,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, TEXT_PLAIN, MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_STREAM, MT_APP_JSON, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, NULL_STR,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_STAR,   MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, STAR,       MT_APP_JSON, NO_PARAM, JSON_OBJECT, 200),
 
-    return Stream.of(
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 200),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 200),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 200),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 200),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 200),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 200),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 200),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 200),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 200),
-
-      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 200),
-      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 200),
-      Arguments.of(okapiHeadersWithPath, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 200),
-      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 200),
-      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 200),
-      Arguments.of(okapiHeadersWithPath, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 200),
-      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 200),
-      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 200),
-      Arguments.of(okapiHeadersWithPath, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 200),
-
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 400),
-      Arguments.of(OKAPI_HEADERS_NO_URL, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 400),
-
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 400),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 400),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 400),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 400),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 400),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 400),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 400),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 400),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 400)
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_RAML,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_JSON,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   TEXT_PLAIN, MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_STREAM, MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   NULL_STR,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   APP_STAR,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_JSON,   STAR,       MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_RAML,   MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_JSON,   MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, TEXT_PLAIN, MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_STREAM, MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  415),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, NULL_STR,   MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, STAR,       MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, TEXT_PLAIN, APP_STAR,   MT_APP_RAML, PATH_PARAM, PLAIN_BODY,  200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_RAML,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_JSON,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, TEXT_PLAIN, MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_STREAM, MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, NULL_STR,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, APP_STAR,   MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200),
+      Arguments.of(OKAPI_HEAD, APP_STREAM, STAR,       MT_APP_RAML, PATH_PARAM, JSON_OBJECT, 200)
     );
+
+    String[] contentTypes = { APP_JSON, TEXT_PLAIN, APP_STREAM };
+    String[] bodys = { JSON_OBJECT, PLAIN_BODY, JSON_OBJECT };
+    String[] accepts = { APP_RAML, APP_JSON, TEXT_PLAIN, APP_STREAM, NULL_STR, APP_STAR, STAR };
+    MediaType[] mediaTypes = { MT_APP_JSON, MT_APP_RAML };
+    Object[] params = { NO_PARAM, PATH_PARAM };
+
+    Stream<Arguments> stream2 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 400);
+    Stream<Arguments> stream = Stream.concat(stream1, stream2);
+    stream1 = buildArguments1(NO_HEAD, contentTypes, accepts, mediaTypes, params, bodys, 400);
+
+    return Stream.concat(stream, stream1);
   }
 
 }
