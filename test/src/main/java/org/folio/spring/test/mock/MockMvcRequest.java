@@ -1,5 +1,6 @@
 package org.folio.spring.test.mock;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.stream.Stream;
@@ -33,13 +34,16 @@ public class MockMvcRequest {
    * @param body The payload body.
    *
    * @return The constructed mock request builder.
-   *
-   * @throws Exception Problems thrown by MockHttpServletRequestBuilder.
+   * @throws InvocationTargetException Problem thrown by MockHttpServletRequestBuilder.
+   * @throws IllegalArgumentException Problem thrown by MockHttpServletRequestBuilder.
+   * @throws IllegalAccessException Problem thrown by MockHttpServletRequestBuilder.
    */
-  public static MockHttpServletRequestBuilder invokeRequestBuilder(String path, Method method, HttpHeaders headers, String contentType, String accept, MultiValueMap<String, String> parameters, String body) throws Exception {
+  public static MockHttpServletRequestBuilder invokeRequestBuilder(String path, Method method, HttpHeaders headers, String contentType, String accept, MultiValueMap<String, String> parameters, String body) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+
     MockHttpServletRequestBuilder request = (MockHttpServletRequestBuilder) method.invoke(null, URI.create(path));
     request = appendHeaders(request, headers, contentType, accept);
     request = appendParameters(request, parameters);
+
     return appendBody(request, body);
   }
 

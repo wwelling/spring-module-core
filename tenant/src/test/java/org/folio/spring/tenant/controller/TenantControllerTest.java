@@ -151,12 +151,12 @@ class TenantControllerTest {
    */
   private static Stream<Arguments> provideHeadersBodyStatusForCreate() throws NoSuchMethodException, SecurityException {
     Stream<Arguments> stream1 = Stream.of(
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   APP_JSON,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_OTHER, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_PLAIN, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   NULL_STR,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_STAR,  MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   STAR,       MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201)
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, APP_JSON,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_OTHER, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_PLAIN, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, NULL_STR,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_STAR,  MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, STAR,       MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201)
     );
 
     String[] contentTypes = { APP_STREAM, TEXT_PLAIN, TEXT_OTHER };
