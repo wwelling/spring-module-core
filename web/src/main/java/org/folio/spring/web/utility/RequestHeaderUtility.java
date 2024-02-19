@@ -6,6 +6,21 @@ import org.springframework.http.MediaType;
 public class RequestHeaderUtility {
 
   /**
+   * A Content-Type for 'application/raml+yaml' as a MediaType for use in the unsupportedAccept() method.
+   */
+  public static final MediaType APP_RAML = new MediaType("application", "raml+yaml");
+
+  /**
+   * A Content-Type for 'application/json' as a MediaType for use in the unsupportedAccept() method.
+   */
+  public static final MediaType APP_JSON = new MediaType("application", "json");
+
+  /**
+   * A Content-Type for 'text/plain' as a MediaType for use in the unsupportedAccept() method.
+   */
+  public static final MediaType TEXT_PLAIN = new MediaType("text", "plain");
+
+  /**
    * Determine if Accept header is missing the supported Content-Type.
    *
    * @param accept The raw HTTP Accept header value.

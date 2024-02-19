@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import org.folio.spring.domain.controller.exception.SchemaIOException;
 import org.folio.spring.domain.service.RamlsService;
+import org.folio.spring.web.utility.RequestHeaderUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,6 @@ public class RamlsController {
   private static final String CONTENT_TYPE_HEADER = "Content-Type";
   private static final String APPLICATION_RAML_YAML = "application/raml+yaml";
   private static final String APPLICATION_JSON = "application/json";
-  private static final MediaType APP_RAML = new MediaType("application", "raml+yaml");
 
   private final RamlsService ramlsService;
 
@@ -41,7 +41,7 @@ public class RamlsController {
   ) {
     try {
       if (path.isPresent()) {
-        if (accept != null && unsupportedAccept(accept, APP_RAML)) {
+        if (accept != null && unsupportedAccept(accept, RequestHeaderUtility.APP_RAML)) {
           return ResponseEntity.status(415).build();
         }
 
