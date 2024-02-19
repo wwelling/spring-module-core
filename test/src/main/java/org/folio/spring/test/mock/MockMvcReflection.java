@@ -11,6 +11,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
  */
 public class MockMvcReflection {
 
+  /**
+   * Private initializer as per java:S1118.
+   */
+  private MockMvcReflection() {
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(MockMvcReflection.class);
 
   /**

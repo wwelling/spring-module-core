@@ -16,6 +16,12 @@ import org.springframework.util.MultiValueMap;
 public class MockMvcRequest {
 
   /**
+   * Private initializer as per java:S1118.
+   */
+  private MockMvcRequest() {
+  }
+
+  /**
    * Construct the mock request builder.
    *
    * @param path The URI path.
@@ -44,10 +50,8 @@ public class MockMvcRequest {
    * @param body The payload body.
    *
    * @return The potentially updated mock request builder.
-   *
-   * @throws Exception Problems thrown by MockHttpServletRequestBuilder.
    */
-  public static MockHttpServletRequestBuilder appendBody(MockHttpServletRequestBuilder request, String body) throws Exception {
+  public static MockHttpServletRequestBuilder appendBody(MockHttpServletRequestBuilder request, String body) {
     return (body == null) ? request : request.content(body);
   }
 
@@ -60,10 +64,8 @@ public class MockMvcRequest {
    * @param accept The HTTP Accept header.
    *
    * @return The potentially updated mock request builder.
-   *
-   * @throws Exception Problems thrown by MockHttpServletRequestBuilder.
    */
-  public static MockHttpServletRequestBuilder appendHeaders(MockHttpServletRequestBuilder request, HttpHeaders headers, String contentType, String accept) throws Exception {
+  public static MockHttpServletRequestBuilder appendHeaders(MockHttpServletRequestBuilder request, HttpHeaders headers, String contentType, String accept) {
     if (headers != null) {
       request = request.headers(headers);
     }
@@ -86,10 +88,8 @@ public class MockMvcRequest {
    * @param parameters The map of all of the parameters.
    *
    * @return The potentially updated mock request builder.
-   *
-   * @throws Exception Problems thrown by MockHttpServletRequestBuilder.
    */
-  public static MockHttpServletRequestBuilder appendParameters(MockHttpServletRequestBuilder request, MultiValueMap<String, String> parameters) throws Exception {
+  public static MockHttpServletRequestBuilder appendParameters(MockHttpServletRequestBuilder request, MultiValueMap<String, String> parameters) {
     if (parameters == null) {
       return request;
     }

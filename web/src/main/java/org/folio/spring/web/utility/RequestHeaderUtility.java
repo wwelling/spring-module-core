@@ -6,6 +6,12 @@ import org.springframework.http.MediaType;
 public class RequestHeaderUtility {
 
   /**
+   * Private initializer as per java:S1118.
+   */
+  private RequestHeaderUtility() {
+  }
+
+  /**
    * A Content-Type for 'application/raml+yaml' as a MediaType for use in the unsupportedAccept() method.
    */
   public static final MediaType APP_RAML = new MediaType("application", "raml+yaml");

@@ -17,20 +17,26 @@ import org.springframework.util.MultiValueMap;
  */
 public class MockMvcConstant {
 
+  /**
+   * Private initializer as per java:S1118.
+   */
+  private MockMvcConstant() {
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(MockMvcConstant.class);
 
   /**
-   * Provide application/json Content-Type.
+   * Provide "application/json" Content-Type.
    */
   public static final String APP_JSON = "application/json";
 
   /**
-   * Provide application/raml+yaml Content-Type.
+   * Provide "application/raml+yaml" Content-Type.
    */
   public static final String APP_RAML = "application/raml+yaml";
 
   /**
-   * Provide application/schema+json Content-Type.
+   * Provide "application/schema+json" Content-Type.
    */
   public static final String APP_SCHEMA = "application/schema+json";
 
@@ -40,7 +46,7 @@ public class MockMvcConstant {
   public static final String APP_STAR = "application/*";
 
   /**
-   * Provide application/octet-stream Content-Type.
+   * Provide "application/octet-stream" Content-Type.
    */
   public static final String APP_STREAM = "application/octet-stream";
 
@@ -87,7 +93,7 @@ public class MockMvcConstant {
   public static final String PATH_PART = "/path";
 
   /**
-   * Provide text to be used as the body of plain/text Content-Type responses.
+   * Provide text to be used as the body of "plain/text" Content-Type responses.
    */
   public static final String PLAIN_BODY = "Plain text.";
 
@@ -104,7 +110,7 @@ public class MockMvcConstant {
   /**
    * Provide text/other Content-Type.
    *
-   * This is intended for testing "text/plain" with or without wildcards like "text/*".
+   * This is intended for testing "text/plain" with or without wild cards like "text/*".
    */
   public static final String TEXT_OTHER = "text/other";
 
@@ -129,22 +135,22 @@ public class MockMvcConstant {
   public static final String VALUE = "value";
 
   /**
-   * Provide the application/json Content-Type (media type) (using different name to avoid conflicts).
+   * Provide the "application/json" Content-Type (media type) (using different name to avoid conflicts).
    */
   public static final MediaType MT_APP_JSON = MediaType.APPLICATION_JSON;
 
   /**
-   * Provide the application/raml+yaml Content-Type (media type).
+   * Provide the "application/raml+yaml" Content-Type (media type).
    */
   public static final MediaType MT_APP_RAML = new MediaType("application", "raml+yaml");
 
   /**
-   * Provide the application/schema+json Content-Type (media type).
+   * Provide the "application/schema+json" Content-Type (media type).
    */
   public static final MediaType MT_APP_SCHEMA = new MediaType("application", "schema+json");
 
   /**
-   * Provide the text/plain Content-Type (media type) (using different name to avoid conflicts).
+   * Provide the "text/plain" Content-Type (media type) (using different name to avoid conflicts).
    */
   public static final MediaType MT_TEXT_PLAIN = MediaType.TEXT_PLAIN;
 
