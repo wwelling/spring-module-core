@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import org.folio.spring.tenant.annotation.TenantHeader;
 import org.folio.spring.tenant.hibernate.HibernateSchemaService;
 import org.folio.spring.tenant.model.request.TenantAttributes;
-import org.folio.spring.web.utility.RequestHeaderUtility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +33,7 @@ public class TenantController {
     @RequestBody @Validated TenantAttributes attributes,
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException, IOException {
-    if (accept != null && unsupportedAccept(accept, RequestHeaderUtility.TEXT_PLAIN)) {
+    if (accept != null && unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
       return ResponseEntity.status(415).build();
     }
 
@@ -46,7 +46,7 @@ public class TenantController {
     @TenantHeader String tenant,
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException {
-    if (accept != null && unsupportedAccept(accept, RequestHeaderUtility.TEXT_PLAIN)) {
+    if (accept != null && unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
       return ResponseEntity.status(415).build();
     }
 
