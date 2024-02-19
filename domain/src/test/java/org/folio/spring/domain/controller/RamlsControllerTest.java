@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +93,7 @@ class RamlsControllerTest {
 
   @Test
   void getThrowsSchemaIOExceptionTest() throws Exception {
-    lenient().when(ramlsService.getRamls()).thenThrow(new SchemaIOException("mock exception", null));
+    lenient().when(ramlsService.getRamls()).thenThrow(new IOException("mock exception", null));
 
     MockHttpServletRequestBuilder request = appendHeaders(get(RAMLS_PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
 
