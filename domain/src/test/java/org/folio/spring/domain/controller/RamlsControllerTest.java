@@ -36,8 +36,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.lang.reflect.Method;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.folio.spring.domain.controller.exception.SchemaIOException;
 import org.folio.spring.domain.service.RamlsService;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -84,6 +88,23 @@ class RamlsControllerTest {
       assertTrue(mediaType.isCompatibleWith(responseType));
       assertEquals(JSON_ARRAY, result.getResponse().getContentAsString());
     }
+  }
+
+  @Test
+  void getThrowsSchemaIOExceptionTest() throws Exception {
+    lenient().when(ramlsService.getRamls()).thenThrow(new SchemaIOException("mock exception", null));
+
+    MockHttpServletRequestBuilder request = appendHeaders(get(RAMLS_PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
+
+    MvcResult result = mvc.perform(appendBody(request, JSON_OBJECT))
+      .andDo(print()).andExpect(status().is(500)).andReturn();
+
+    MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
+    assertTrue(MT_APP_JSON.isCompatibleWith(responseType));
+
+    Pattern pattern = Pattern.compile("\"type\":\"SchemaIOException\"");
+    Matcher matcher = pattern.matcher(result.getResponse().getContentAsString());
+    assertTrue(matcher.find());
   }
 
   @ParameterizedTest
