@@ -41,7 +41,7 @@ public class RamlsController {
   ) {
     try {
       if (path.isPresent()) {
-        if (accept != null && unsupportedAccept(accept, RequestHeaderUtility.APP_RAML)) {
+        if (unsupportedAccept(accept, RequestHeaderUtility.APP_RAML)) {
           return ResponseEntity.status(415).build();
         }
 
@@ -49,7 +49,7 @@ public class RamlsController {
           .header(CONTENT_TYPE_HEADER, APPLICATION_RAML_YAML)
           .body(ramlsService.getRamlByPath(path.get(), okapiUrl));
       } else {
-        if (accept != null && unsupportedAccept(accept, MediaType.APPLICATION_JSON)) {
+        if (unsupportedAccept(accept, MediaType.APPLICATION_JSON)) {
           return ResponseEntity.status(415).build();
         }
 

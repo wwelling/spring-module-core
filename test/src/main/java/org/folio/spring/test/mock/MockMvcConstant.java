@@ -1,7 +1,12 @@
 package org.folio.spring.test.mock;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.CollectionUtils;
@@ -12,6 +17,8 @@ import org.springframework.util.MultiValueMap;
  */
 public class MockMvcConstant {
 
+  private static final Logger logger = LoggerFactory.getLogger(MockMvcConstant.class);
+
   /**
    * Provide application/json Content-Type.
    */
@@ -21,6 +28,11 @@ public class MockMvcConstant {
    * Provide application/raml+yaml Content-Type.
    */
   public static final String APP_RAML = "application/raml+yaml";
+
+  /**
+   * Provide application/schema+json Content-Type.
+   */
+  public static final String APP_SCHEMA = "application/schema+json";
 
   /**
    * Provide "application/*", mainly intended to be used as a wild card in an HTTP Accept header.
@@ -127,6 +139,11 @@ public class MockMvcConstant {
   public static final MediaType MT_APP_RAML = new MediaType("application", "raml+yaml");
 
   /**
+   * Provide the application/schema+json Content-Type (media type).
+   */
+  public static final MediaType MT_APP_SCHEMA = new MediaType("application", "schema+json");
+
+  /**
    * Provide the text/plain Content-Type (media type) (using different name to avoid conflicts).
    */
   public static final MediaType MT_TEXT_PLAIN = MediaType.TEXT_PLAIN;
@@ -186,4 +203,26 @@ public class MockMvcConstant {
    */
   public static final MultiValueMap<String, String> PATH_PARAM = CollectionUtils.toMultiValueMap(Map.of(PATH, List.of(PATH_PART))); 
 
+  /**
+   * Provide a generic list of strings of no importance intended for use as a generic list response.
+   */
+  public static final List<String> STRING_LIST = new ArrayList<>(List.of(PATH, VALUE));
+
+  /**
+   * Provide a generic list of strings of no importance in JSON array format intended for use as a generic list response.
+   */
+  public static final String STRING_LIST_AS_JSON;
+
+  static {
+    String responseAsJson = "";
+
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      responseAsJson = objectMapper.writeValueAsString(STRING_LIST);
+    } catch (JsonProcessingException e) {
+      logger.error("Initialization of static string list as JSON failed.", e);
+    }
+
+    STRING_LIST_AS_JSON = responseAsJson;
+  }
 }

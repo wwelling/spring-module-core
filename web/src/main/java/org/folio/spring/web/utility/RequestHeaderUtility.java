@@ -11,6 +11,11 @@ public class RequestHeaderUtility {
   public static final MediaType APP_RAML = new MediaType("application", "raml+yaml");
 
   /**
+   * A Content-Type for 'application/schema+json' as a MediaType for use in the unsupportedAccept() method.
+   */
+  public static final MediaType APP_SCHEMA = new MediaType("application", "schema+json");
+
+  /**
    * Determine if Accept header is missing the supported Content-Type.
    *
    * @param accept The raw HTTP Accept header value.
@@ -18,9 +23,13 @@ public class RequestHeaderUtility {
    *
    * @return
    *   True if the Content-Type is not in the Accept header.
-   *   False otherwise.
+   *   False otherwise or when accept is NULL.
    */
   public static boolean unsupportedAccept(String accept, MediaType ...contentTypes) {
+    if (accept == null) {
+      return false;
+    }
+
     Iterator<MediaType> iter = MediaType.parseMediaTypes(accept).iterator();
 
     while (iter.hasNext()) {

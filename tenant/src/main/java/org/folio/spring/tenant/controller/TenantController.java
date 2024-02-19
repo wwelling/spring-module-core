@@ -33,7 +33,7 @@ public class TenantController {
     @RequestBody @Validated TenantAttributes attributes,
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException, IOException {
-    if (accept != null && unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
+    if (unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
       return ResponseEntity.status(415).build();
     }
 
@@ -46,7 +46,7 @@ public class TenantController {
     @TenantHeader String tenant,
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException {
-    if (accept != null && unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
+    if (unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
       return ResponseEntity.status(415).build();
     }
 
