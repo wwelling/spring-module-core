@@ -40,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.folio.spring.domain.controller.exception.SchemaIOException;
 import org.folio.spring.domain.service.RamlsService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +63,7 @@ import org.springframework.util.MultiValueMap;
 @ExtendWith(MockitoExtension.class)
 class RamlsControllerTest {
 
-  private static final String RAMLS_PATH = "/_/ramls";
+  private static final String PATH = "/_/ramls";
 
   @Autowired
   private MockMvc mvc;
@@ -77,7 +76,7 @@ class RamlsControllerTest {
   void getWorksTest(HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
     lenient().when(ramlsService.getRamlByPath(anyString(), anyString())).thenReturn(JSON_ARRAY);
 
-    MockHttpServletRequestBuilder request = appendHeaders(get(RAMLS_PATH), headers, contentType, accept);
+    MockHttpServletRequestBuilder request = appendHeaders(get(PATH), headers, contentType, accept);
     request = appendParameters(request, parameters);
 
     MvcResult result = mvc.perform(appendBody(request, body))
@@ -95,7 +94,7 @@ class RamlsControllerTest {
   void getThrowsSchemaIOExceptionTest() throws Exception {
     lenient().when(ramlsService.getRamls()).thenThrow(new IOException("mock exception", null));
 
-    MockHttpServletRequestBuilder request = appendHeaders(get(RAMLS_PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
+    MockHttpServletRequestBuilder request = appendHeaders(get(PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
 
     MvcResult result = mvc.perform(appendBody(request, JSON_OBJECT))
       .andDo(print()).andExpect(status().is(500)).andReturn();
@@ -111,7 +110,7 @@ class RamlsControllerTest {
   @ParameterizedTest
   @MethodSource("provideDeletePatchPostPut")
   void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
-    mvc.perform(invokeRequestBuilder(RAMLS_PATH, method, headers, contentType, accept, parameters, body))
+    mvc.perform(invokeRequestBuilder(PATH, method, headers, contentType, accept, parameters, body))
       .andDo(print()).andExpect(status().is(status));
   }
 

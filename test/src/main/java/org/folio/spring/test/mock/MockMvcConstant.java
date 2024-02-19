@@ -90,9 +90,21 @@ public class MockMvcConstant {
   public static final String SUCCESS = "Success";
 
   /**
-   * Provide text/plaon Content-Type.
+   * Provide text/other Content-Type.
+   *
+   * This is intended for testing "text/plain" with or without wildcards like "text/*".
+   */
+  public static final String TEXT_OTHER = "text/other";
+
+  /**
+   * Provide text/plain Content-Type.
    */
   public static final String TEXT_PLAIN = "text/plain";
+
+  /**
+   * Provide text/* Content-Type.
+   */
+  public static final String TEXT_STAR = "text/*";
 
   /**
    * Provide basic HTTP URL.
@@ -113,6 +125,11 @@ public class MockMvcConstant {
    * Provide the application/raml+yaml Content-Type (media type).
    */
   public static final MediaType MT_APP_RAML = new MediaType("application", "raml+yaml");
+
+  /**
+   * Provide the text/plain Content-Type (media type) (using different name to avoid conflicts).
+   */
+  public static final MediaType MT_TEXT_PLAIN = MediaType.TEXT_PLAIN;
 
   /**
    * Provide a set of HTTP headers containing the OKAPI Tenant, Token, and URL HTTP Headers and values.
@@ -136,6 +153,20 @@ public class MockMvcConstant {
    */
   public static final HttpHeaders OKAPI_HEAD_TENANT = new HttpHeaders(CollectionUtils.toMultiValueMap(Map.of(
     OKAPI_TENANT, List.of(VALUE)
+  )));
+
+  /**
+   * Provide a set of HTTP headers containing the OKAPI Token Header and values.
+   */
+  public static final HttpHeaders OKAPI_HEAD_TOKEN = new HttpHeaders(CollectionUtils.toMultiValueMap(Map.of(
+    OKAPI_TOKEN, List.of(VALUE)
+  )));
+
+  /**
+   * Provide a set of HTTP headers containing the OKAPI URL Header and values.
+   */
+  public static final HttpHeaders OKAPI_HEAD_URL = new HttpHeaders(CollectionUtils.toMultiValueMap(Map.of(
+    OKAPI_URL, List.of(URL)
   )));
 
   /**

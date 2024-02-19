@@ -1,17 +1,29 @@
 package org.folio.spring.tenant.controller;
 
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.APPLICATION_JSON;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.APPLICATION_STREAM;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.JSON_OBJECT;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.NO_HEADERS;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.OKAPI_HEADERS;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.PLAIN_BODY;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.SUCCESS;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.TEXT_PLAIN;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.appendBody;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.appendHeaders;
-import static org.folio.spring.tenant.utility.mock.MockMvcRequest.invokeRequestBuilder;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_JSON;
+import static org.folio.spring.test.mock.MockMvcConstant.APP_STREAM;
+import static org.folio.spring.test.mock.MockMvcConstant.JSON_OBJECT;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_JSON;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_TEXT_PLAIN;
+import static org.folio.spring.test.mock.MockMvcConstant.NO_PARAM;
+import static org.folio.spring.test.mock.MockMvcConstant.NULL_STR;
+import static org.folio.spring.test.mock.MockMvcConstant.OKAPI_HEAD_NO_URL;
+import static org.folio.spring.test.mock.MockMvcConstant.PLAIN_BODY;
+import static org.folio.spring.test.mock.MockMvcConstant.STAR;
+import static org.folio.spring.test.mock.MockMvcConstant.SUCCESS;
+import static org.folio.spring.test.mock.MockMvcConstant.TEXT_OTHER;
+import static org.folio.spring.test.mock.MockMvcConstant.TEXT_PLAIN;
+import static org.folio.spring.test.mock.MockMvcConstant.TEXT_STAR;
+import static org.folio.spring.test.mock.MockMvcReflection.GET;
+import static org.folio.spring.test.mock.MockMvcReflection.PATCH;
+import static org.folio.spring.test.mock.MockMvcReflection.PUT;
+import static org.folio.spring.test.mock.MockMvcRequest.appendBody;
+import static org.folio.spring.test.mock.MockMvcRequest.appendHeaders;
+import static org.folio.spring.test.mock.MockMvcRequest.buildArguments1;
+import static org.folio.spring.test.mock.MockMvcRequest.buildArguments2;
+import static org.folio.spring.test.mock.MockMvcRequest.invokeRequestBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -20,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.stream.Stream;
 import org.folio.spring.tenant.hibernate.HibernateSchemaService;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,17 +44,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.MultiValueMap;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class TenantControllerTest {
 
-  private static final String TENANT_PATH = "/_/tenant";
+  private static final String PATH = "/_/tenant";
 
   @Autowired
   private MockMvc mvc;
@@ -53,38 +65,35 @@ class TenantControllerTest {
 
   @ParameterizedTest
   @MethodSource("provideHeadersBodyStatusForCreate")
-  void createPostWorksTest(HttpHeaders headers, String contentType, String accept, String body, int status) throws Exception {
+  void createPostWorksTest(HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
     lenient().doNothing().when(hibernateSchemaService).createTenant(anyString());
 
-    MockHttpServletRequestBuilder request = appendHeaders(post(TENANT_PATH), headers, contentType, accept);
+    MockHttpServletRequestBuilder request = appendHeaders(post(PATH), headers, contentType, accept);
 
     MvcResult result = mvc.perform(appendBody(request, body))
       .andDo(print()).andExpect(status().is(status)).andReturn();
 
     if (status == 201) {
-      String contentTypeOnly = result.getResponse().getContentType().replaceAll(";.*$", "");
-
-      // @fixme "text/plain" is always returned even if Accept is asking for something different. Is this inteded behavior?
-      String acceptContentType = accept != null && !accept.equals(APPLICATION_STREAM) ? accept : TEXT_PLAIN;
+      MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
  
-      assertEquals(acceptContentType, contentTypeOnly);
+      assertTrue(mediaType.isCompatibleWith(responseType));
       assertEquals(SUCCESS, result.getResponse().getContentAsString());
     }
   }
 
   @ParameterizedTest
   @MethodSource("provideGetPatchPut")
-  void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, String body, int status) throws Exception {
-    mvc.perform(invokeRequestBuilder(TENANT_PATH, method, headers, contentType, accept, body))
-      .andDo(print()).andExpect(status().is(status));
+  void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
+    mvc.perform(invokeRequestBuilder(PATH, method, headers, contentType, accept, parameters, body))
+    .andDo(print()).andExpect(status().is(status));
   }
 
   @ParameterizedTest
   @MethodSource("provideHeadersBodyStatusForDelete")
-  void deletePostWorksTest(HttpHeaders headers, String contentType, String accept, String body, int status) throws Exception {
+  void deletePostWorksTest(HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
     lenient().doNothing().when(hibernateSchemaService).createTenant(anyString());
 
-    MockHttpServletRequestBuilder request = appendHeaders(delete(TENANT_PATH), headers, contentType, accept);
+    MockHttpServletRequestBuilder request = appendHeaders(delete(PATH), headers, contentType, accept);
 
     mvc.perform(appendBody(request, body))
       .andDo(print()).andExpect(status().is(status));
@@ -93,74 +102,33 @@ class TenantControllerTest {
   /**
    * Helper function for parameterized test providing GET, PATCH, and PUT.
    *
-   * @return The arguments array.
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - Method The (reflection) request method.
+   *     - HttpHeaders headers.
+   *     - String contentType (Content-Type request).
+   *     - String accept (ask for this Content-Type on response).
+   *       String mediaType (response Content-Type).
+   *     - MultiValueMap<String, String> parameters.
+   *     - String body (request body).
+   *     - int status (response HTTP status code).
    *
    * @throws SecurityException
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideGetPatchPut() throws NoSuchMethodException, SecurityException {
-    Method get = MockMvcRequestBuilders.class.getDeclaredMethod("get", URI.class);
-    Method patch = MockMvcRequestBuilders.class.getDeclaredMethod("patch", URI.class);
-    Method put = MockMvcRequestBuilders.class.getDeclaredMethod("put", URI.class);
+    String[] contentTypes = { APP_STREAM, TEXT_PLAIN, TEXT_OTHER };
+    String[] bodys = { JSON_OBJECT, PLAIN_BODY, TEXT_PLAIN };
+    String[] accepts = { APP_JSON, TEXT_OTHER, TEXT_PLAIN, NULL_STR, TEXT_STAR, STAR };
+    MediaType[] mediaTypes = { MT_APP_JSON, MT_TEXT_PLAIN };
+    Object[] params = { NO_PARAM };
 
-    return Stream.of(
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(get, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(get, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(get, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(get, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(get, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(get, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(get, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
+    Stream<Arguments> stream1 = buildArguments2(GET, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    Stream<Arguments> stream2 = buildArguments2(PATCH, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    Stream<Arguments> stream = Stream.concat(stream1, stream2);
 
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(patch, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 405),
-      Arguments.of(put, NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 405)
-    );
+    stream1 = buildArguments2(PUT, OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 405);
+    return Stream.concat(stream, stream1);
   }
 
   /**
@@ -168,35 +136,37 @@ class TenantControllerTest {
    *
    * This is intended to be used for when the correct HTTP method is being used in the request.
    *
-   * @fixme the NO_HEADERS are passing, is the OKAPI Tenant header required?
-   *
-   * @return The arguments array.
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - HttpHeaders headers.
+   *     - String contentType (Content-Type request).
+   *     - String accept (ask for this Content-Type on response).
+   *       String mediaType (response Content-Type).
+   *     - MultiValueMap<String, String> parameters.
+   *     - String body (request body).
+   *     - int status (response HTTP status code).
    *
    * @throws SecurityException
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideHeadersBodyStatusForCreate() throws NoSuchMethodException, SecurityException {
-    return Stream.of(
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 201),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 415),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 415),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 415),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 415),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 415),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 415),
-
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 201),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 201),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 201),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 415),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 415),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 415),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 415),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 415),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 415)
+    Stream<Arguments> stream1 = Stream.of(
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   APP_JSON,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_OTHER, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_PLAIN, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   NULL_STR,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   TEXT_STAR,  MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON,   STAR,       MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201)
     );
+
+    String[] contentTypes = { APP_STREAM, TEXT_PLAIN, TEXT_OTHER };
+    String[] bodys = { JSON_OBJECT, PLAIN_BODY, TEXT_PLAIN };
+    String[] accepts = { APP_JSON, TEXT_OTHER, TEXT_PLAIN, NULL_STR, TEXT_STAR, STAR };
+    MediaType[] mediaTypes = { MT_APP_JSON, MT_TEXT_PLAIN };
+    Object[] params = { NO_PARAM };
+
+    Stream<Arguments> stream2 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, accepts, mediaTypes, params, bodys, 415);
+    return Stream.concat(stream1, stream2);
   }
 
   /**
@@ -204,35 +174,31 @@ class TenantControllerTest {
    *
    * This is intended to be used for when the correct HTTP method is being used in the request.
    *
-   * @fixme the NO_HEADERS are passing, is the OKAPI Tenant header required?
-   *
-   * @return The arguments array.
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - HttpHeaders headers.
+   *     - String contentType (Content-Type request).
+   *     - String accept (ask for this Content-Type on response).
+   *       String mediaType (response Content-Type).
+   *     - MultiValueMap<String, String> parameters.
+   *     - String body (request body).
+   *     - int status (response HTTP status code).
    *
    * @throws SecurityException
    * @throws NoSuchMethodException
    */
   private static Stream<Arguments> provideHeadersBodyStatusForDelete() throws NoSuchMethodException, SecurityException {
-    return Stream.of(
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 204),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 204),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 204),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 204),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 204),
-      Arguments.of(OKAPI_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 204),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 204),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 204),
-      Arguments.of(OKAPI_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 204),
+    String[] contentTypes = { APP_STREAM, TEXT_PLAIN, TEXT_OTHER };
+    String[] bodys = { JSON_OBJECT, PLAIN_BODY, TEXT_PLAIN };
+    String[] acceptsInvalid = { APP_JSON, TEXT_OTHER };
+    String[] acceptsValid = { TEXT_PLAIN, NULL_STR, TEXT_STAR, STAR };
+    MediaType[] mediaTypes = { MT_APP_JSON, MT_TEXT_PLAIN };
+    Object[] params = { NO_PARAM };
 
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_JSON, JSON_OBJECT, 204),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, TEXT_PLAIN, JSON_OBJECT, 204),
-      Arguments.of(NO_HEADERS, APPLICATION_JSON, APPLICATION_STREAM, JSON_OBJECT, 204),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_JSON, PLAIN_BODY, 204),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, TEXT_PLAIN, PLAIN_BODY, 204),
-      Arguments.of(NO_HEADERS, TEXT_PLAIN, APPLICATION_STREAM, PLAIN_BODY, 204),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_JSON, JSON_OBJECT, 204),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, TEXT_PLAIN, JSON_OBJECT, 204),
-      Arguments.of(NO_HEADERS, APPLICATION_STREAM, APPLICATION_STREAM, JSON_OBJECT, 204)
-    );
+    Stream<Arguments> stream1 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, acceptsInvalid, mediaTypes, params, bodys, 415);
+    Stream<Arguments> stream2 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, acceptsValid, mediaTypes, params, bodys, 204);
+
+    return Stream.concat(stream1, stream2);
   }
 
 }

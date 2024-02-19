@@ -29,17 +29,15 @@ public class RamlsController {
 
   @Autowired
   public RamlsController(RamlsService ramlsService) {
-      this.ramlsService = ramlsService;
+    this.ramlsService = ramlsService;
   }
 
   @GetMapping
   public ResponseEntity<Object> getRamls(
-  // @formatter:off
     HttpServletResponse response,
     @RequestParam(value = "path", required = false) Optional<String> path,
     @RequestHeader(value = "x-okapi-url", required = true) String okapiUrl,
     @RequestHeader(value = "accept", required = false) String accept
-  // @formatter:on
   ) {
     try {
       if (path.isPresent()) {
