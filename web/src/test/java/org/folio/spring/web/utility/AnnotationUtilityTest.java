@@ -10,17 +10,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.context.request.NativeWebRequest;
 
 @ExtendWith(MockitoExtension.class)
 class AnnotationUtilityTest {
-
-  @MockBean
-  private AnnotationUtils annotationUtils;
 
   @Mock
   private MethodParameter parameter;
@@ -75,9 +73,13 @@ class AnnotationUtilityTest {
     when(parameter.getParameterAnnotation(any())).thenReturn((Annotation) null);
     when(parameter.getParameterAnnotations()).thenReturn(annotations);
 
-    Annotation result = AnnotationUtility.findMethodAnnotation(FakeAnnotation.class, parameter);
+    try (MockedStatic<AnnotationUtils> utility = Mockito.mockStatic(AnnotationUtils.class)) {
+      utility.when(() -> AnnotationUtils.findAnnotation((Class<?>) any(Class.class), any())).thenReturn(fakeAnnotation);
 
-    assertNull(result);
+      Annotation result = AnnotationUtility.findMethodAnnotation(FakeAnnotation.class, parameter);
+
+      assertEquals(fakeAnnotation, result);
+    }
   }
 
   private class FakeAnnotation implements Annotation {
