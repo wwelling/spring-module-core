@@ -90,7 +90,6 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
     this.writeAcceptCharset = writeAcceptCharset;
   }
 
-
   @Override
   public boolean supports(Class<?> clazz) {
     return Object.class == clazz;
@@ -128,7 +127,6 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
     Charset charset = getContentTypeCharset(headers.getContentType());
     StreamUtils.copy(obj.toString(), charset, outputMessage.getBody());
   }
-
 
   /**
    * Return the list of supported {@link Charset Charsets}.
