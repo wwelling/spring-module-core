@@ -154,6 +154,19 @@ class ObjectPlainTextConverterTest {
   }
 
   @Test
+  void writeInternalWorksWithNullAcceptCharsetTest() throws IOException {
+    MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+    HttpHeaders headers = new HttpHeaders();
+    assertEquals(0, headers.size());
+
+    setField(outputMessage, "headers", headers);
+    setField(objectPlainTextConverter, "writeAcceptCharset", true);
+
+    objectPlainTextConverter.writeInternal(VALUE, outputMessage);
+    assertEquals(VALUE, outputMessage.getBody().toString());
+  }
+
+  @Test
   void getAcceptedCharsetsWorksTest() throws IOException {
     setField(objectPlainTextConverter, "availableCharsets", new ArrayList<>());
 
