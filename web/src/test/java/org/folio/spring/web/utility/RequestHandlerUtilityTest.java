@@ -1,8 +1,15 @@
 package org.folio.spring.web.utility;
 
+import static org.folio.spring.web.utility.RequestHeaderUtility.APP_JSON_PLUS;
 import static org.folio.spring.web.utility.RequestHeaderUtility.APP_RAML;
 import static org.folio.spring.web.utility.RequestHeaderUtility.APP_SCHEMA;
+import static org.folio.spring.web.utility.RequestHeaderUtility.compatibleWith;
+import static org.folio.spring.web.utility.RequestHeaderUtility.unsupportedAccept;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+import static org.springframework.http.MediaType.IMAGE_GIF;
+import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 
 import java.util.stream.Stream;
@@ -32,31 +39,29 @@ class RequestHandlerUtilityTest {
 
   @Test
   void unsupportedAcceptHandlesNullAcceptTest() {
-    boolean result = RequestHeaderUtility.unsupportedAccept(null);
-
-    assertEquals(false, result);
+    assertEquals(false, unsupportedAccept(null));
   }
 
   @Test
   void unsupportedAcceptHandlesNullListTest() {
-    boolean result = RequestHeaderUtility.unsupportedAccept(null);
-
-    assertEquals(false, result);
+    assertEquals(false, unsupportedAccept(null));
   }
 
   @Test
   void unsupportedAcceptHandlesEmptyAcceptTest() {
-    boolean result = RequestHeaderUtility.unsupportedAccept(TEXT_PLAIN_TYPE);
-
-    assertEquals(true, result);
+    assertEquals(true, unsupportedAccept(TEXT_PLAIN_TYPE));
   }
 
   @ParameterizedTest
-  @MethodSource("provideMatchContentTypes")
-  void unsupportedAcceptWorksTest(String contentType, MediaType mediaType1, MediaType mediaType2, MediaType mediaType3, boolean expect) {
-    boolean result = RequestHeaderUtility.unsupportedAccept(contentType, mediaType1, mediaType2, mediaType3);
+  @MethodSource("provideIsCompatibleContentTypes")
+  void compatibleWithWorksTest(MediaType contentType, MediaType mediaType1, MediaType mediaType2, MediaType mediaType3, boolean expect) {
+    assertEquals(expect, compatibleWith(contentType, mediaType1, mediaType2, mediaType3));
+  }
 
-    assertEquals(expect, result);
+  @ParameterizedTest
+  @MethodSource("provideUnsupportedAcceptContentTypes")
+  void unsupportedAcceptWorksTest(String contentType, MediaType mediaType1, MediaType mediaType2, MediaType mediaType3, boolean expect) {
+    assertEquals(expect, unsupportedAccept(contentType, mediaType1, mediaType2, mediaType3));
   }
 
   /**
@@ -68,9 +73,31 @@ class RequestHandlerUtilityTest {
    *     - MediaType mediaType1 (the first MediaType to match).
    *     - MediaType mediaType2 (the second MediaType to match).
    *     - MediaType mediaType3 (the third MediaType to match).
-   *     - boolean expect (the expected boolean result on match or miss).
+   *     - boolean expect (the expected result on unsupported (true) or supported (false)).
    */
-  private static Stream<Arguments> provideMatchContentTypes() {
+  private static Stream<Arguments> provideIsCompatibleContentTypes() {
+    return Stream.of(
+      Arguments.of(APPLICATION_JSON,         APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true),
+      Arguments.of(APPLICATION_OCTET_STREAM, APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false),
+      Arguments.of(IMAGE_GIF,                APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false),
+      Arguments.of(TEXT_PLAIN,               APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true),
+      Arguments.of(TEXT_HTML,                APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false),
+      Arguments.of(APP_SCHEMA,               APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true)
+    );
+  }
+
+  /**
+   * Helper function for parameterized test providing tests for a given content type for the set of three.
+   *
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - String contentType (Content-Type request).
+   *     - MediaType mediaType1 (the first MediaType to match).
+   *     - MediaType mediaType2 (the second MediaType to match).
+   *     - MediaType mediaType3 (the third MediaType to match).
+   *     - boolean expect (the expected result on unsupported (true) or supported (false)).
+   */
+  private static Stream<Arguments> provideUnsupportedAcceptContentTypes() {
     return Stream.of(
       Arguments.of(TEXT_PLAIN_TYPE,    APP_RAML,  APP_SCHEMA, TEXT_PLAIN, false),
       Arguments.of(APP_RAML_TYPE,      APP_RAML,  APP_SCHEMA, TEXT_PLAIN, false),
