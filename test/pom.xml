@@ -13,6 +13,11 @@
   <name>Spring Okapi Module Core Testing</name>
   <description>A library intended to be used with writing unit tests, integration tests, and model viewer controller tests.</description>
 
+  <properties>
+    <!-- Sonar Cloud Configuration -->
+    <sonar.exclusions>**/mock/*.java</sonar.exclusions>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
