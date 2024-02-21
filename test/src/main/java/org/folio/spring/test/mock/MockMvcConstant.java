@@ -150,9 +150,19 @@ public class MockMvcConstant {
   public static final MediaType MT_APP_SCHEMA = new MediaType("application", "schema+json");
 
   /**
+   * Provide the "application/*" Content-Type (media type).
+   */
+  public static final MediaType MT_APP_STAR = new MediaType("application", "*");
+
+  /**
    * Provide the "text/plain" Content-Type (media type) (using different name to avoid conflicts).
    */
   public static final MediaType MT_TEXT_PLAIN = MediaType.TEXT_PLAIN;
+
+  /**
+   * Provide the null Content-Type (media type) (using different name to avoid conflicts).
+   */
+  public static final MediaType MT_NULL = null;
 
   /**
    * Provide a set of HTTP headers containing the OKAPI Tenant, Token, and URL HTTP Headers and values.

@@ -6,29 +6,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+import static org.springframework.http.MediaType.IMAGE_GIF;
+import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 import static org.springframework.test.util.ReflectionTestUtils.invokeSetterMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_SCHEMA;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_STAR;
+import static org.folio.spring.test.mock.MockMvcConstant.NO_HEAD;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_NULL;
 import static org.folio.spring.test.mock.MockMvcConstant.VALUE;
+import static  org.folio.spring.web.utility.RequestHeaderUtility.APP_JSON_PLUS;
+import static org.folio.spring.web.utility.RequestHeaderUtility.APP_SCHEMA;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -37,6 +51,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 class ObjectPlainTextConverterTest {
+
+  private static final List<Charset> AVAILABLE_CHARSETS = new ArrayList<>(Charset.availableCharsets().values());
+
+  private static final List<Charset> NULL_CHARSETS = null;
 
   @Mock
   private MethodParameter parameter;
@@ -118,52 +136,36 @@ class ObjectPlainTextConverterTest {
     assertEquals(VALUE.length(), (int) result);
   }
 
-  @Test
-  void addDefaultHeadersWorksTest() throws IOException {
-    HttpHeaders headers = new HttpHeaders();
-    assertEquals(0, headers.size());
+  @ParameterizedTest
+  @MethodSource("provideAddDefaultHeader")
+  void addDefaultHeadersWorks(HttpHeaders headers, MediaType type, MediaType expect) throws IOException {
+    objectPlainTextConverter.addDefaultHeaders(headers, VALUE, type);
 
-    objectPlainTextConverter.addDefaultHeaders(headers, VALUE, TEXT_PLAIN);
     assertEquals(2, headers.size());
     assertEquals(VALUE.length(), headers.getContentLength());
-    assertTrue(compatibleWith(headers.getContentType(), TEXT_PLAIN));
+    assertTrue(compatibleWith(headers.getContentType(), expect));
   }
 
-  @Test
-  void addDefaultHeadersWorksWithJsonTest() throws IOException {
+  @ParameterizedTest
+  @MethodSource("provideWriteInternal")
+  void writeInternalWorks(List<Charset> charset, MediaType contentType, boolean writeAcceptCharset) throws IOException {
     HttpHeaders headers = new HttpHeaders();
-    assertEquals(0, headers.size());
-
-    objectPlainTextConverter.addDefaultHeaders(headers, VALUE, APPLICATION_JSON);
-    assertEquals(2, headers.size());
-    assertEquals(VALUE.length(), headers.getContentLength());
-    assertTrue(compatibleWith(headers.getContentType(), APPLICATION_JSON));
-  }
-
-  @Test
-  void writeInternalWorksTest() throws IOException {
     MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAcceptCharset(new ArrayList<>(Charset.availableCharsets().values()));
-    assertEquals(1, headers.size());
+
+    if (charset != null) {
+      headers.setAcceptCharset(charset);
+    }
+
+    if (contentType != null) {
+      headers.setContentType(contentType);
+    }
 
     setField(outputMessage, "headers", headers);
+    setField(objectPlainTextConverter, "writeAcceptCharset", writeAcceptCharset);
 
     objectPlainTextConverter.writeInternal(VALUE, outputMessage);
     assertEquals(VALUE, outputMessage.getBody().toString());
-  }
-
-  @Test
-  void writeInternalWorksWithNullAcceptCharsetTest() throws IOException {
-    MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
-    HttpHeaders headers = new HttpHeaders();
-    assertEquals(0, headers.size());
-
-    setField(outputMessage, "headers", headers);
-    setField(objectPlainTextConverter, "writeAcceptCharset", true);
-
-    objectPlainTextConverter.writeInternal(VALUE, outputMessage);
-    assertEquals(VALUE, outputMessage.getBody().toString());
+    assertEquals(contentType, outputMessage.getHeaders().getContentType());
   }
 
   @Test
@@ -181,6 +183,65 @@ class ObjectPlainTextConverterTest {
     setField(objectPlainTextConverter, "availableCharsets", null);
 
     assertNotNull(objectPlainTextConverter.getAcceptedCharsets());
+  }
+
+  /**
+   * Helper function for parameterized test providing tests for the add default header tests.
+   *
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - HttpHeaders headers (Must be a new instance due to modifications by test).
+   *     - MediaType type (the type to pass to the addDefaultHeaders()).
+   *     - MediaType expect (the MediaType to match or be compatible with).
+   */
+  private static Stream<Arguments> provideAddDefaultHeader() {
+    HttpHeaders headers1 = new HttpHeaders();
+    HttpHeaders headers2 = new HttpHeaders();
+    HttpHeaders headers3 = new HttpHeaders();
+    HttpHeaders headers4 = new HttpHeaders();
+    HttpHeaders headers5 = new HttpHeaders();
+    HttpHeaders headers6 = new HttpHeaders();
+    headers1.setContentType(TEXT_PLAIN);
+    headers2.setContentType(APPLICATION_JSON);
+    headers3.setContentType(MT_APP_SCHEMA);
+    headers4.setContentType(TEXT_PLAIN);
+    headers5.setContentType(APPLICATION_JSON);
+    headers6.setContentType(MT_APP_SCHEMA);
+
+    return Stream.of(
+      Arguments.of(headers1,          MT_NULL,          TEXT_PLAIN),
+      Arguments.of(headers2,          MT_NULL,          APPLICATION_JSON),
+      Arguments.of(headers3,          MT_NULL,          MT_APP_SCHEMA),
+      Arguments.of(headers4,          APPLICATION_JSON, TEXT_PLAIN),
+      Arguments.of(headers5,          APPLICATION_JSON, APPLICATION_JSON),
+      Arguments.of(headers6,          APPLICATION_JSON, MT_APP_SCHEMA),
+      Arguments.of(new HttpHeaders(), MT_NULL,          TEXT_PLAIN),
+      Arguments.of(new HttpHeaders(), MT_APP_STAR,      TEXT_PLAIN),
+      Arguments.of(new HttpHeaders(), APPLICATION_JSON, APPLICATION_JSON),
+      Arguments.of(new HttpHeaders(), MT_APP_SCHEMA,    MT_APP_SCHEMA)
+    );
+  }
+
+  /**
+   * Helper function for parameterized test providing tests for the write internal tests.
+   *
+   * @return
+   *   The arguments array stream with the stream columns as:
+   *     - List<Charset> charset (the default charset to use)).
+   *     - MediaType contentType (the Content-Type to use).
+   *     - boolean writeAcceptCharset (the value of writeAcceptCharset in objectPlainTextConverter).
+   */
+  private static Stream<Arguments> provideWriteInternal() {
+    return Stream.of(
+      Arguments.of(AVAILABLE_CHARSETS, APPLICATION_JSON, false),
+      Arguments.of(NULL_CHARSETS,      MT_APP_SCHEMA,    false),
+      Arguments.of(AVAILABLE_CHARSETS, APPLICATION_JSON, true),
+      Arguments.of(NULL_CHARSETS,      MT_APP_SCHEMA,    true),
+      Arguments.of(AVAILABLE_CHARSETS, MT_NULL,          false),
+      Arguments.of(NULL_CHARSETS,      MT_NULL,          false),
+      Arguments.of(AVAILABLE_CHARSETS, MT_NULL,          true),
+      Arguments.of(NULL_CHARSETS,      MT_NULL,          true)
+    );
   }
 
 }
