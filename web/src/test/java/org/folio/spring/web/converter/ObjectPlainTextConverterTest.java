@@ -1,28 +1,21 @@
 package org.folio.spring.web.converter;
 
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_SCHEMA;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_STAR;
+import static org.folio.spring.test.mock.MockMvcConstant.MT_NULL;
+import static org.folio.spring.test.mock.MockMvcConstant.VALUE;
 import static org.folio.spring.web.converter.ObjectPlainTextConverter.DEFAULT_CHARSET;
 import static org.folio.spring.web.utility.RequestHeaderUtility.compatibleWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
-import static org.springframework.http.MediaType.IMAGE_GIF;
-import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 import static org.springframework.test.util.ReflectionTestUtils.invokeSetterMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
-import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_SCHEMA;
-import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_STAR;
-import static org.folio.spring.test.mock.MockMvcConstant.NO_HEAD;
-import static org.folio.spring.test.mock.MockMvcConstant.MT_NULL;
-import static org.folio.spring.test.mock.MockMvcConstant.VALUE;
-import static  org.folio.spring.web.utility.RequestHeaderUtility.APP_JSON_PLUS;
-import static org.folio.spring.web.utility.RequestHeaderUtility.APP_SCHEMA;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

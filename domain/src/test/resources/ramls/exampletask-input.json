@@ -1,0 +1,18 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "ExampleTask",
+  "type" : "object",
+  "additionalProperties" : false,
+  "properties" : {
+    "inputVariables" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/EmbeddedVariable"
+      }
+    },
+    "outputVariable" : {
+      "$ref" : "/replaceme"
+    }
+  },
+  "required" : [ "deserializeAs", "name", "asyncBefore", "asyncAfter" ]
+}

@@ -52,6 +52,7 @@ public class JsonSchemasService {
     String schema = schemaNode.toString();
     Matcher matcher = REF_MATCH_PATTERN.matcher(schema);
     StringBuffer sb = new StringBuffer(schema.length());
+
     while (matcher.find()) {
       String path = matcher.group(1);
       if (!path.startsWith(HASH_TAG)) {

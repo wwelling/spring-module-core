@@ -1,7 +1,5 @@
 package org.folio.spring.domain.service;
 
-import static org.folio.spring.test.mock.MockMvcConstant.MT_APP_SCHEMA;
-import static org.folio.spring.test.mock.MockMvcConstant.MT_NULL;
 import static org.folio.spring.test.mock.MockMvcConstant.PATH;
 import static org.folio.spring.test.mock.MockMvcConstant.URL;
 import static org.folio.spring.test.mock.MockMvcConstant.VALUE;
@@ -9,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +15,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import org.folio.spring.domain.controller.exception.SchemaNotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,6 +63,11 @@ class RamlsServiceTest {
   @InjectMocks
   private RamlsService ramlsService;
 
+  @BeforeEach
+  void beforeEach() {
+    ramlsService = new RamlsService(resolver);
+  }
+
   @Test
   void getRamlsWorksTest() throws IOException {
     Resource[] resources = { resource };
@@ -81,7 +84,6 @@ class RamlsServiceTest {
   @MethodSource("provideGetRamlsByPath")
   void getRamlsByPathWorksTest(String path, String raml, String expect) throws IOException {
     InputStream stream = IOUtils.toInputStream(raml, "UTF-8");
-    ramlsService = new RamlsService(resolver);
 
     when(resource.exists()).thenReturn(true);
     when(resource.getInputStream()).thenReturn(stream);
@@ -93,8 +95,6 @@ class RamlsServiceTest {
 
   @Test
   void getRamlsByPathThrowsSchemaNotFoundExceptionTest() throws IOException {
-    ramlsService = new RamlsService(resolver);
-
     when(resource.exists()).thenReturn(false);
     when(resolver.getResource(anyString())).thenReturn(resource);
 

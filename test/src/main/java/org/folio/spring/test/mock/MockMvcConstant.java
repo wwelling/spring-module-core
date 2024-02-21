@@ -56,9 +56,24 @@ public class MockMvcConstant {
   public static final String JSON_ARRAY = "[]";
 
   /**
+   * Provide JSON array with a generic value.
+   */
+  public static final String JSON_ARRAY_VALUE = "[\"value\"]";
+
+  /**
    * Provide empty JSON object.
    */
   public static final String JSON_OBJECT = "{}";
+
+  /**
+   * Provide JSON object with a generic key and value.
+   */
+  public static final String JSON_OBJECT_VALUE = "{\"key\":\"value\"}";
+
+  /**
+   * Provide generic string for use as a key.
+   */
+  public static final String KEY = "key";
 
   /**
    * Provide OKAPI Tenant HTTP Header.
