@@ -12,19 +12,24 @@ public class RequestHeaderUtility {
   }
 
   /**
+   * The "application" string for use when constructing media types.
+   */
+  public static final String APPLICATION = "application";
+
+  /**
    * A Content-Type for "application/*+json" as a MediaType.
    */
-  public static final MediaType APP_JSON_PLUS = new MediaType("application", "*+json");
+  public static final MediaType APP_JSON_PLUS = new MediaType(APPLICATION, "*+json");
 
   /**
    * A Content-Type for "application/raml+yaml" as a MediaType.
    */
-  public static final MediaType APP_RAML = new MediaType("application", "raml+yaml");
+  public static final MediaType APP_RAML = new MediaType(APPLICATION, "raml+yaml");
 
   /**
    * A Content-Type for "application/schema+json" as a MediaType.
    */
-  public static final MediaType APP_SCHEMA = new MediaType("application", "schema+json");
+  public static final MediaType APP_SCHEMA = new MediaType(APPLICATION, "schema+json");
 
   /**
    * Determine if Accept header is missing the supported Content-Type.
