@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class AbstractBaseEntityTest {
 
-  private static class ConcreteEntity extends AbstractBaseEntity { } ;
+  private static class ConcreteEntity extends AbstractBaseEntity { }
 
   @InjectMocks
   private ConcreteEntity concreteEntity;
