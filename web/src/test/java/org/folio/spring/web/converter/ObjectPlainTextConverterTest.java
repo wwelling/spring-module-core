@@ -110,6 +110,7 @@ class ObjectPlainTextConverterTest {
 
   @Test
   void readInternalThrowsIllegalStateExceptionTest() throws IOException {
+    Class<?> clazz = getClass();
     MockClientHttpResponse inputMessage = new MockClientHttpResponse(VALUE.getBytes(), 200);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(TEXT_PLAIN);
@@ -119,7 +120,7 @@ class ObjectPlainTextConverterTest {
     setField(objectPlainTextConverter, "defaultCharset", null);
 
     Assertions.assertThrows(IllegalStateException.class, () -> {
-      objectPlainTextConverter.readInternal(getClass(), inputMessage);
+      objectPlainTextConverter.readInternal(clazz, inputMessage);
     });
   }
 
