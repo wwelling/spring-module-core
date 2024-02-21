@@ -1,5 +1,6 @@
 package org.folio.spring.web.utility;
 
+import static org.folio.spring.test.mock.MockMvcConstant.NULL_STR;
 import static org.folio.spring.web.utility.RequestHeaderUtility.APP_JSON_PLUS;
 import static org.folio.spring.web.utility.RequestHeaderUtility.APP_RAML;
 import static org.folio.spring.web.utility.RequestHeaderUtility.APP_SCHEMA;
@@ -82,7 +83,8 @@ class RequestHandlerUtilityTest {
       Arguments.of(IMAGE_GIF,                APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false),
       Arguments.of(TEXT_PLAIN,               APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true),
       Arguments.of(TEXT_HTML,                APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false),
-      Arguments.of(APP_SCHEMA,               APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true)
+      Arguments.of(APP_SCHEMA,               APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, true),
+      Arguments.of(NULL_STR,                 APPLICATION_JSON, APP_JSON_PLUS, TEXT_PLAIN, false)
     );
   }
 
