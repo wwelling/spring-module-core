@@ -12,6 +12,9 @@
     },
     "outputVariable" : {
       "$ref" : "http://localhost/_/jsonSchemas?path=/replaceme"
+    },
+    "ramlsValue" : {
+      "$ref" : "http://localhost/_/jsonSchemas?path=workflow.raml"
     }
   },
   "required" : [ "deserializeAs", "name", "asyncBefore", "asyncAfter" ]

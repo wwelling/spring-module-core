@@ -12,6 +12,9 @@
     },
     "outputVariable" : {
       "$ref" : "/replaceme"
+    },
+    "ramlsValue" : {
+      "$ref" : "/ramls/workflow.raml"
     }
   },
   "required" : [ "deserializeAs", "name", "asyncBefore", "asyncAfter" ]
