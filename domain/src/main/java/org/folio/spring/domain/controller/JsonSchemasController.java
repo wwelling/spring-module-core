@@ -42,14 +42,14 @@ public class JsonSchemasController {
     try {
       if (path.isPresent()) {
         if (unsupportedAccept(accept, RequestHeaderUtility.APP_SCHEMA)) {
-          return ResponseEntity.status(415).build();
+          return ResponseEntity.status(406).build();
         }
 
         String schema = jsonSchemasService.getSchemaByPath(path.get(), okapiUrl);
         return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_SCHEMA_JSON).body(schema);
       } else {
         if (unsupportedAccept(accept, MediaType.APPLICATION_JSON)) {
-          return ResponseEntity.status(415).build();
+          return ResponseEntity.status(406).build();
         }
 
         return ResponseEntity.ok().header(CONTENT_TYPE_HEADER, APPLICATION_JSON).body(jsonSchemasService.getSchemas());

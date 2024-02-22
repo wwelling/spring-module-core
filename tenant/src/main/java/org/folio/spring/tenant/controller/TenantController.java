@@ -34,7 +34,7 @@ public class TenantController {
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException, IOException {
     if (unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
-      return ResponseEntity.status(415).build();
+      return ResponseEntity.status(406).build();
     }
 
     hibernateSchemaService.createTenant(tenant);
@@ -47,7 +47,7 @@ public class TenantController {
     @RequestHeader(value = "accept", required = false) String accept
   ) throws SQLException {
     if (unsupportedAccept(accept, MediaType.TEXT_PLAIN)) {
-      return ResponseEntity.status(415).build();
+      return ResponseEntity.status(406).build();
     }
 
     hibernateSchemaService.deleteTenant(tenant);

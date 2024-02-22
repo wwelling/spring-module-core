@@ -42,7 +42,7 @@ public class RamlsController {
     try {
       if (path.isPresent()) {
         if (unsupportedAccept(accept, RequestHeaderUtility.APP_RAML)) {
-          return ResponseEntity.status(415).build();
+          return ResponseEntity.status(406).build();
         }
 
         return ResponseEntity.ok()
@@ -50,7 +50,7 @@ public class RamlsController {
           .body(ramlsService.getRamlByPath(path.get(), okapiUrl));
       } else {
         if (unsupportedAccept(accept, MediaType.APPLICATION_JSON)) {
-          return ResponseEntity.status(415).build();
+          return ResponseEntity.status(406).build();
         }
 
         return ResponseEntity.ok()

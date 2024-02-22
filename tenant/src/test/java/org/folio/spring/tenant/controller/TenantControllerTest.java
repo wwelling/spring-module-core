@@ -151,8 +151,8 @@ class TenantControllerTest {
    */
   private static Stream<Arguments> provideHeadersBodyStatusForCreate() throws NoSuchMethodException, SecurityException {
     Stream<Arguments> stream1 = Stream.of(
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, APP_JSON,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
-      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_OTHER, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 415),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, APP_JSON,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 406),
+      Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_OTHER, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 406),
       Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_PLAIN, MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
       Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, NULL_STR,   MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
       Arguments.of(OKAPI_HEAD_NO_URL, APP_JSON, TEXT_STAR,  MT_TEXT_PLAIN, NO_PARAM, JSON_OBJECT, 201),
@@ -195,7 +195,7 @@ class TenantControllerTest {
     MediaType[] mediaTypes = { MT_APP_JSON, MT_TEXT_PLAIN };
     Object[] params = { NO_PARAM };
 
-    Stream<Arguments> stream1 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, acceptsInvalid, mediaTypes, params, bodys, 415);
+    Stream<Arguments> stream1 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, acceptsInvalid, mediaTypes, params, bodys, 406);
     Stream<Arguments> stream2 = buildArguments1(OKAPI_HEAD_NO_URL, contentTypes, acceptsValid, mediaTypes, params, bodys, 204);
 
     return Stream.concat(stream1, stream2);
