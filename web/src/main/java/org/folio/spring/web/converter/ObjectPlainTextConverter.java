@@ -16,6 +16,12 @@
 
 package org.folio.spring.web.converter;
 
+import static org.springframework.http.MediaType.ALL;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.TEXT_PLAIN;
+import static org.folio.spring.web.utility.RequestHeaderUtility.APP_JSON_PLUS;
+import static org.folio.spring.web.utility.RequestHeaderUtility.compatibleWith;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -45,8 +51,6 @@ import org.springframework.util.StreamUtils;
  */
 public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Object> {
 
-  private static final MediaType APPLICATION_PLUS_JSON = new MediaType("application", "*+json");
-
   /**
    * The default charset used by the converter.
    */
@@ -72,7 +76,7 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
    * type does not specify one.
    */
   public ObjectPlainTextConverter(Charset defaultCharset) {
-    super(defaultCharset, MediaType.TEXT_PLAIN, MediaType.ALL);
+    super(defaultCharset, TEXT_PLAIN, ALL);
   }
 
 
@@ -85,7 +89,6 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
   public void setWriteAcceptCharset(boolean writeAcceptCharset) {
     this.writeAcceptCharset = writeAcceptCharset;
   }
-
 
   @Override
   public boolean supports(Class<?> clazz) {
@@ -107,7 +110,7 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
   @Override
   protected void addDefaultHeaders(HttpHeaders headers, Object o, @Nullable MediaType type) throws IOException {
     if (headers.getContentType() == null && type != null && type.isConcrete() &&
-       (type.isCompatibleWith(MediaType.APPLICATION_JSON) || type.isCompatibleWith(APPLICATION_PLUS_JSON))) {
+       (type.isCompatibleWith(APPLICATION_JSON) || type.isCompatibleWith(APP_JSON_PLUS))) {
 
       // Prevent charset parameter for JSON..
       headers.setContentType(type);
@@ -124,7 +127,6 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
     Charset charset = getContentTypeCharset(headers.getContentType());
     StreamUtils.copy(obj.toString(), charset, outputMessage.getBody());
   }
-
 
   /**
    * Return the list of supported {@link Charset Charsets}.
@@ -144,17 +146,20 @@ public class ObjectPlainTextConverter extends AbstractHttpMessageConverter<Objec
   private Charset getContentTypeCharset(@Nullable MediaType contentType) {
     if (contentType != null) {
       Charset charset = contentType.getCharset();
+
       if (charset != null) {
         return charset;
       }
-      else if (contentType.isCompatibleWith(MediaType.APPLICATION_JSON) ||
-          contentType.isCompatibleWith(APPLICATION_PLUS_JSON)) {
-        // Matching to AbstractJackson2HttpMessageConverter#DEFAULT_CHARSET
+
+      // Matching to AbstractJackson2HttpMessageConverter#DEFAULT_CHARSET.
+      if (compatibleWith(contentType, APPLICATION_JSON, APP_JSON_PLUS)) {
         return StandardCharsets.UTF_8;
       }
     }
+
     Charset charset = getDefaultCharset();
     Assert.state(charset != null, "No default charset");
+
     return charset;
   }
 

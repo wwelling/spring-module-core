@@ -1,0 +1,21 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "title" : "ExampleTask",
+  "type" : "object",
+  "additionalProperties" : false,
+  "properties" : {
+    "inputVariables" : {
+      "type" : "array",
+      "items" : {
+        "$ref" : "#/definitions/EmbeddedVariable"
+      }
+    },
+    "outputVariable" : {
+      "$ref" : "http://localhost/_/jsonSchemas?path=/replaceme"
+    },
+    "ramlsValue" : {
+      "$ref" : "http://localhost/_/jsonSchemas?path=workflow.raml"
+    }
+  },
+  "required" : [ "deserializeAs", "name", "asyncBefore", "asyncAfter" ]
+}
