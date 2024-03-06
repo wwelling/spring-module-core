@@ -50,13 +50,14 @@ public class RamlsService {
     StringBuffer sb = new StringBuffer(raml.length());
     while (matcher.find()) {
       String path = matcher.group(0);
+      String url = okapiUrl.replaceAll("/$", "");
       if (path.contains(RAMLS_PATH)) {
         path = path.substring(path.lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
       }
       if (path.endsWith(RAML_EXT)) {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/ramls?path=" + path));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(url + "/_/ramls?path=" + path));
       } else {
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(okapiUrl + "/_/jsonSchemas?path=" + path));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(url + "/_/jsonSchemas?path=" + path));
       }
     }
     matcher.appendTail(sb);

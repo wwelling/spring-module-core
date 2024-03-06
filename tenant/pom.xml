@@ -28,6 +28,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.folio</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
@@ -46,7 +53,6 @@
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-c3p0</artifactId>
     </dependency>
-
   </dependencies>
 
 </project>

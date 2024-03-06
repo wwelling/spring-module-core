@@ -28,6 +28,7 @@
     <module>domain</module>
     <module>messaging</module>
     <module>tenant</module>
+    <module>test</module>
     <module>web</module>
   </modules>
 

@@ -52,13 +52,15 @@ public class JsonSchemasService {
     String schema = schemaNode.toString();
     Matcher matcher = REF_MATCH_PATTERN.matcher(schema);
     StringBuffer sb = new StringBuffer(schema.length());
+
     while (matcher.find()) {
       String path = matcher.group(1);
       if (!path.startsWith(HASH_TAG)) {
+        String url = okapiUrl.replaceAll("/$", "");
         if (path.contains(RAMLS_PATH)) {
           path = path.substring(path.lastIndexOf(RAMLS_PATH) + RAMLS_PATH.length());
         }
-        matcher.appendReplacement(sb, Matcher.quoteReplacement("\"$ref\":\"" + okapiUrl + "/_/jsonSchemas?path=" + path + "\""));
+        matcher.appendReplacement(sb, Matcher.quoteReplacement("\"$ref\":\"" + url + "/_/jsonSchemas?path=" + path + "\""));
       }
     }
     matcher.appendTail(sb);
