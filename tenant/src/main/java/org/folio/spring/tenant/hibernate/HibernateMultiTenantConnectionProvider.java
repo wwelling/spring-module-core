@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HibernateMultiTenantConnectionProvider implements MultiTenantConnectionProvider {
+public class HibernateMultiTenantConnectionProvider implements MultiTenantConnectionProvider<String> {
 
   private static final long serialVersionUID = 5748544845255283079L;
 
-  @Value("${spring.datasource.platform:h2}")
+  @Value("${spring.sql.init.platform:postgres}")
   private String platform;
 
   @Autowired
@@ -59,7 +59,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException("Could not alter JDBC connection to use schema [" + schema + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + schema + "] on platform [" + platform + "]", e);
     }
     return connection;
   }
@@ -81,7 +81,7 @@ public class HibernateMultiTenantConnectionProvider implements MultiTenantConnec
           throw new HibernateException("Unknown datasource platform [" + platform + "]");
       }
     } catch (SQLException e) {
-      throw new HibernateException("Could not alter JDBC connection to use schema [" + defaultSchema + "]", e);
+      throw new HibernateException("Could not alter JDBC connection to use schema [" + defaultSchema + "] on platform [" + platform + "]", e);
     } finally {
       connection.close();
     }

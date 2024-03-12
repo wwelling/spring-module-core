@@ -16,7 +16,7 @@ public class SqlTemplateService {
   private static final String SCHEMA = "schema";
   private static final String DOT = ".";
 
-  @Value("${spring.datasource.platform:h2}")
+  @Value("${spring.sql.init.platform:postgres}")
   private String platform;
 
   @Autowired

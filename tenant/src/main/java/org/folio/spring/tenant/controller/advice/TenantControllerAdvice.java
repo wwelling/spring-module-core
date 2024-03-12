@@ -2,11 +2,10 @@ package org.folio.spring.tenant.controller.advice;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
-import org.folio.spring.model.response.ResponseErrors;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
 import org.folio.spring.tenant.exception.TenantDoesNotExistsException;
-import org.folio.spring.utility.ErrorUtility;
+import org.folio.spring.web.model.response.ResponseErrors;
+import org.folio.spring.web.utility.ErrorUtility;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,35 +21,35 @@ public class TenantControllerAdvice {
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = SQLException.class)
-  public ResponseErrors hasndleSQLException(SQLException exception) {
+  public ResponseErrors handleSQLException(SQLException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = IOException.class)
-  public ResponseErrors hasndleIOException(IOException exception) {
+  public ResponseErrors handleIOException(IOException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(value = HibernateException.class)
-  public ResponseErrors hasndleHibernateException(HibernateException exception) {
+  public ResponseErrors handleHibernateException(HibernateException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ExceptionHandler(value = TenantAlreadyExistsException.class)
-  public ResponseErrors hasndleTenantAlreadyExistsException(TenantAlreadyExistsException exception) {
+  public ResponseErrors handleTenantAlreadyExistsException(TenantAlreadyExistsException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.NO_CONTENT);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(value = TenantDoesNotExistsException.class)
-  public ResponseErrors hasndleTenantDoesNotExistsException(TenantDoesNotExistsException exception) {
+  public ResponseErrors handleTenantDoesNotExistsException(TenantDoesNotExistsException exception) {
     logger.debug(exception.getMessage(), exception);
     return ErrorUtility.buildError(exception, HttpStatus.BAD_REQUEST);
   }
