@@ -7,6 +7,9 @@ logging:
       folio: INFO
       hibernate: INFO
       springframework: INFO
+
+      # Uncomment to enable MockMvc unit test logging.
+      #springframework.test.web.servlet.result: DEBUG
   path:
 
 server:

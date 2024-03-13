@@ -10,7 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -66,7 +66,7 @@ class DomainAdviceTest {
     MockHttpServletRequestBuilder request = appendHeaders(get(PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
 
     MvcResult result = mvc.perform(appendBody(request, JSON_OBJECT))
-      .andDo(print()).andExpect(status().is(status)).andReturn();
+      .andDo(log()).andExpect(status().is(status)).andReturn();
 
     Pattern pattern = Pattern.compile("\"type\":\"" + simpleName+ "\"");
     Matcher matcher = pattern.matcher(result.getResponse().getContentAsString());

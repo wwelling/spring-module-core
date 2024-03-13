@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.lang.reflect.Method;
@@ -71,7 +71,7 @@ class TenantControllerTest {
     MockHttpServletRequestBuilder request = appendHeaders(post(PATH), headers, contentType, accept);
 
     MvcResult result = mvc.perform(appendBody(request, body))
-      .andDo(print()).andExpect(status().is(status)).andReturn();
+      .andDo(log()).andExpect(status().is(status)).andReturn();
 
     if (status == 201) {
       MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
@@ -85,7 +85,7 @@ class TenantControllerTest {
   @MethodSource("provideGetPatchPut")
   void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
     mvc.perform(invokeRequestBuilder(PATH, method, headers, contentType, accept, parameters, body))
-    .andDo(print()).andExpect(status().is(status));
+    .andDo(log()).andExpect(status().is(status));
   }
 
   @ParameterizedTest
@@ -96,7 +96,7 @@ class TenantControllerTest {
     MockHttpServletRequestBuilder request = appendHeaders(delete(PATH), headers, contentType, accept);
 
     mvc.perform(appendBody(request, body))
-      .andDo(print()).andExpect(status().is(status));
+      .andDo(log()).andExpect(status().is(status));
   }
 
   /**
