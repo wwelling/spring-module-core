@@ -68,7 +68,7 @@ class DomainAdviceTest {
     MvcResult result = mvc.perform(appendBody(request, JSON_OBJECT))
       .andDo(log()).andExpect(status().is(status)).andReturn();
 
-    Pattern pattern = Pattern.compile("\"type\":\"" + simpleName+ "\"");
+    Pattern pattern = Pattern.compile("\"type\":\"" + simpleName + "\"");
     Matcher matcher = pattern.matcher(result.getResponse().getContentAsString());
     assertTrue(matcher.find());
   }
