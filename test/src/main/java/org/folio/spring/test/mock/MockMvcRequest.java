@@ -115,19 +115,19 @@ public class MockMvcRequest {
    * @return The stream of arguments.
    */
   public static Stream<Arguments> buildArguments1(HttpHeaders headers, String[] contentTypes, String[] accepts, MediaType[] mediaTypes, Object[] params, String[] bodys, int status) {
-    Builder<Arguments> builder = Stream.builder();
+    Builder<Arguments> stream = Stream.builder();
 
     for (int i = 0; i < contentTypes.length; i++) {
       for (String accept : accepts) {
         for (MediaType mediaType : mediaTypes) {
           for (Object param : params) {
-            builder.add(Arguments.of(headers, contentTypes[i], accept, mediaType, param, bodys[i], status));
+            stream.add(Arguments.of(headers, contentTypes[i], accept, mediaType, param, bodys[i], status));
           }
         }
       }
     }
 
-    return builder.build();
+    return stream.build();
   }
 
   /**
@@ -145,19 +145,19 @@ public class MockMvcRequest {
    * @return The stream of arguments.
    */
   public static Stream<Arguments> buildArguments2(Method method, HttpHeaders headers, String[] contentTypes, String[] accepts, MediaType[] mediaTypes, Object[] params, String[] bodys, int status) {
-    Builder<Arguments> builder = Stream.builder();
+    Builder<Arguments> stream = Stream.builder();
 
     for (int i = 0; i < contentTypes.length; i++) {
       for (String accept : accepts) {
         for (MediaType mediaType : mediaTypes) {
           for (Object param : params) {
-            builder.add(Arguments.of(method, headers, contentTypes[i], accept, mediaType, param, bodys[i], status));
+            stream.add(Arguments.of(method, headers, contentTypes[i], accept, mediaType, param, bodys[i], status));
           }
         }
       }
     }
 
-    return builder.build();
+    return stream.build();
   }
 
 }
