@@ -51,6 +51,11 @@ public class MockMvcConstant {
   public static final String APP_STREAM = "application/octet-stream";
 
   /**
+   * Provide generic string for use as an ID.
+   */
+  public static final String ID = "id";
+
+  /**
    * Provide empty JSON array.
    */
   public static final String JSON_ARRAY = "[]";
@@ -145,6 +150,11 @@ public class MockMvcConstant {
   public static final String URL = "http://localhost/";
 
   /**
+   * Provide generic string for use as an UUID.
+   */
+  public static final String UUID = "aec4faca-8c3d-4b3b-a943-6003636991c0";
+
+  /**
    * Provide generic string for use as a value.
    */
   public static final String VALUE = "value";
@@ -233,6 +243,11 @@ public class MockMvcConstant {
    * Provide a set of parameters containing the path parameter and its values.
    */
   public static final MultiValueMap<String, String> PATH_PARAM = CollectionUtils.toMultiValueMap(Map.of(PATH, List.of(PATH_PART))); 
+
+  /**
+   * Provide a set of parameters containing the ID parameter and its values.
+   */
+  public static final MultiValueMap<String, String> ID_PARAM = CollectionUtils.toMultiValueMap(Map.of(ID, List.of(UUID))); 
 
   /**
    * Provide a generic list of strings of no importance intended for use as a generic list response.

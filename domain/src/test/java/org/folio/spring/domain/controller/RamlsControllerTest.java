@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
@@ -87,7 +87,7 @@ class RamlsControllerTest {
     request = appendParameters(request, parameters);
 
     MvcResult result = mvc.perform(appendBody(request, body))
-      .andDo(print()).andExpect(status().is(status)).andReturn();
+      .andDo(log()).andExpect(status().is(status)).andReturn();
 
     if (status == 200) {
       MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
@@ -110,7 +110,7 @@ class RamlsControllerTest {
     MockHttpServletRequestBuilder request = appendHeaders(get(PATH), OKAPI_HEAD, APP_JSON, APP_JSON);
 
     MvcResult result = mvc.perform(appendBody(request, JSON_OBJECT))
-      .andDo(print()).andExpect(status().is(500)).andReturn();
+      .andDo(log()).andExpect(status().is(500)).andReturn();
 
     MediaType responseType = MediaType.parseMediaType(result.getResponse().getContentType());
     assertTrue(MT_APP_JSON.isCompatibleWith(responseType));
@@ -124,7 +124,7 @@ class RamlsControllerTest {
   @MethodSource("provideDeletePatchPostPut")
   void createNonPostFailsTest(Method method, HttpHeaders headers, String contentType, String accept, MediaType mediaType, MultiValueMap<String, String> parameters, String body, int status) throws Exception {
     mvc.perform(invokeRequestBuilder(PATH, method, headers, contentType, accept, parameters, body))
-      .andDo(print()).andExpect(status().is(status));
+      .andDo(log()).andExpect(status().is(status));
   }
 
   /**
