@@ -1,13 +1,17 @@
 info.build.artifact: mod-example
 
 logging:
-  file: logs/mod-workflow-tests.log
+  path: logs
+  file: ${logging.file.path}/spring-tenant-tests.log
   level:
     org:
-      folio: INFO
-      hibernate: INFO
-      springframework: INFO
-  path:
+      folio: WARN
+      hibernate: WARN
+      springframework: WARN
+      springframework.test: INFO
+
+      # Uncomment to enable MockMvc unit test logging.
+      #springframework.test.web.servlet.result: DEBUG
 
 server:
   port: 9101
