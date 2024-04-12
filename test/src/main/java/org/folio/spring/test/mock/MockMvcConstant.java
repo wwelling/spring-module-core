@@ -51,6 +51,11 @@ public class MockMvcConstant {
   public static final String APP_STREAM = "application/octet-stream";
 
   /**
+   * Provide the application string.
+   */
+  public static final String APPLICATION = "application";
+
+  /**
    * Provide generic string for use as an ID.
    */
   public static final String ID = "id";
@@ -167,17 +172,17 @@ public class MockMvcConstant {
   /**
    * Provide the "application/raml+yaml" Content-Type (media type).
    */
-  public static final MediaType MT_APP_RAML = new MediaType("application", "raml+yaml");
+  public static final MediaType MT_APP_RAML = new MediaType(APPLICATION, "raml+yaml");
 
   /**
    * Provide the "application/schema+json" Content-Type (media type).
    */
-  public static final MediaType MT_APP_SCHEMA = new MediaType("application", "schema+json");
+  public static final MediaType MT_APP_SCHEMA = new MediaType(APPLICATION, "schema+json");
 
   /**
    * Provide the "application/*" Content-Type (media type).
    */
-  public static final MediaType MT_APP_STAR = new MediaType("application", "*");
+  public static final MediaType MT_APP_STAR = new MediaType(APPLICATION, "*");
 
   /**
    * Provide the "text/plain" Content-Type (media type) (using different name to avoid conflicts).
