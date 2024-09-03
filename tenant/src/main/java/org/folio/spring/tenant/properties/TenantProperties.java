@@ -21,6 +21,8 @@ public class TenantProperties implements Serializable {
 
   private boolean initializeDefaultTenant = false;
 
+  private boolean recreateDefaultTenant = false;
+
   private List<String> domainPackages = new ArrayList<>();
 
   private List<String> schemaScripts = new ArrayList<>();
@@ -55,6 +57,14 @@ public class TenantProperties implements Serializable {
 
   public void setInitializeDefaultTenant(boolean initializeDefaultTenant) {
     this.initializeDefaultTenant = initializeDefaultTenant;
+  }
+
+  public boolean isRecreateDefaultTenant() {
+    return recreateDefaultTenant;
+  }
+
+  public void setRecreateDefaultTenant(boolean recreateDefaultTenant) {
+    this.recreateDefaultTenant = recreateDefaultTenant;
   }
 
   public List<String> getDomainPackages() {
