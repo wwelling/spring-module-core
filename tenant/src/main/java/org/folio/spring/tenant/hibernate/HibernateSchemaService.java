@@ -1,5 +1,6 @@
 package org.folio.spring.tenant.hibernate;
 
+import jakarta.persistence.Entity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,9 +16,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.persistence.Entity;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.folio.spring.tenant.exception.TenantAlreadyExistsException;
@@ -35,6 +33,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.io.Resource;
@@ -47,13 +46,17 @@ public class HibernateSchemaService implements InitializingBean {
 
   private final static String CONNECTION_DRIVER_CLASS = "connection.driver_class";
   private final static String DIALECT = "dialect";
+  private final static String DATABASE_PLATFORM = "database-platform";
+  private final static String HIBERNATE_DEFAULT_SCHEMA = "hibernate.default_schema";
+  private final static String HIBERNATE_DDLAUTO = "hibernate.ddl-auto";
   private final static String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
   private final static String HIBERNATE_CONNECTION_DRIVER_CLASS = "hibernate.connection.driver_class";
-  private final static String HIBERNATE_DEFAULT_SCHEMA = "hibernate.default_schema";
-  private final static String HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION = "hibernate.jdbc.lob.non_contextual_creation";
   private final static String HIBERNATE_CONNECTION_USERNAME = "hibernate.connection.username";
   private final static String HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
   private final static String HIBERNATE_HBM2DDL_AUTO = "hibernate.hbm2ddl.auto";
+  private final static String HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION = "hibernate.jdbc.lob.non_contextual_creation";
+  private final static String HIBERNATE_OPENINVIEW = "hibernate.open-in-view";
+  private final static String HIBERNATE_SHOWSQL = "hibernate.show-sql";
 
   private final List<String> domainPackages = new ArrayList<String>();
 
@@ -73,6 +76,9 @@ public class HibernateSchemaService implements InitializingBean {
   private JpaProperties jpaProperties;
 
   @Autowired
+  private HibernateProperties hibernateProperties;
+
+  @Autowired
   private ResourceLoader resourceLoader;
 
   @Autowired(required = false)
@@ -87,8 +93,15 @@ public class HibernateSchemaService implements InitializingBean {
     if (tenantProperties.isInitializeDefaultTenant()) {
       String tenant = tenantProperties.getDefaultTenant();
       Map<String, String> settings = getSettings(tenant);
+
       try (Connection connection = getConnection(settings)) {
-        if (!schemaExists(connection, settings)) {
+        if (tenantProperties.isRecreateDefaultTenant()) {
+          if (schemaExists(connection, settings)) {
+            deleteTenant(tenant);
+          }
+
+          initializeSchema(connection, settings);
+        } else if (!schemaExists(connection, settings)) {
           initializeSchema(connection, settings);
         }
       }
@@ -188,17 +201,26 @@ public class HibernateSchemaService implements InitializingBean {
   }
 
   private Map<String, String> getSettings(String tenant) {
+    String ddlAuto = hibernateProperties.getDdlAuto();
+    if (ddlAuto == null) {
+      ddlAuto = "none";
+    }
+
     Map<String, String> settings = new HashMap<String, String>();
     settings.put(CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
+    settings.put(DATABASE_PLATFORM, jpaProperties.getDatabasePlatform());
     settings.put(DIALECT, jpaProperties.getDatabasePlatform());
     settings.put(HIBERNATE_CONNECTION_URL, dataSourceProperties.getUrl());
     settings.put(HIBERNATE_CONNECTION_DRIVER_CLASS, dataSourceProperties.getDriverClassName());
-    settings.put(HIBERNATE_DEFAULT_SCHEMA, schemaService.getSchema(tenant));
-    settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true");
     settings.put(HIBERNATE_CONNECTION_USERNAME, dataSourceProperties.getUsername());
     settings.put(HIBERNATE_CONNECTION_PASSWORD, dataSourceProperties.getPassword());
-    settings.put(HIBERNATE_HBM2DDL_AUTO, "none");
-    settings.put("show_sql", String.valueOf(jpaProperties.isShowSql()));
+    settings.put(HIBERNATE_DDLAUTO, ddlAuto);
+    settings.put(HIBERNATE_DEFAULT_SCHEMA, schemaService.getSchema(tenant));
+    settings.put(HIBERNATE_HBM2DDL_AUTO, ddlAuto);
+    settings.put(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, jpaProperties.getProperties().getOrDefault(HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION, "true"));
+    settings.put(HIBERNATE_OPENINVIEW, jpaProperties.getOpenInView() ? "true" : "false");
+    settings.put(HIBERNATE_SHOWSQL, jpaProperties.isShowSql() ? "true" : "false");
+
     return settings;
   }
 
