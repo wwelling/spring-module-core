@@ -23,17 +23,13 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 @Profile("messaging")
 public class KafkaMessageConfig {
 
-  // cut and past from - https://github.com/folio-org/mod-remote-storage/blob/master/src/main/java/org/folio/rs/config/KafkaConfiguration.java
   @Bean
   public ConcurrentKafkaListenerContainerFactory<String, Event> kafkaListenerContainerFactory(
     KafkaProperties kafkaProperties
   ) {
-    var factory = new ConcurrentKafkaListenerContainerFactory<String, Event>();
+    ConcurrentKafkaListenerContainerFactory<String, Event> factory = new ConcurrentKafkaListenerContainerFactory<>();
     factory.setBatchListener(true);
     factory.setConsumerFactory(jsonNodeConsumerFactory(kafkaProperties));
-    // minus lombok @Slf4j
-    // factory.setCommonErrorHandler(new DefaultErrorHandler((exception, data) -> log.error(
-    //  "Error in process with Exception {} and the record is {}", exception, data)));
 
     return factory;
   }
@@ -41,7 +37,7 @@ public class KafkaMessageConfig {
   private ConsumerFactory<String, Event> jsonNodeConsumerFactory(
     KafkaProperties kafkaProperties
   ) {
-    var deserializer = new JsonDeserializer<>(Event.class);
+    JsonDeserializer<Event> deserializer = new JsonDeserializer<>(Event.class);
     Map<String, Object> config = new HashMap<>(kafkaProperties.buildConsumerProperties(null));
     config.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     config.put(VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
